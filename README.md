@@ -1,15 +1,15 @@
 # MCP Computrabajo
 
-MCP server for Computrabajo, Latin America's largest job board: search offers, read the full posting, check your own CV and apply.
+Servidor MCP para Computrabajo, la bolsa de empleo más grande de Latinoamérica: busca ofertas, lee la publicación completa, consulta tu propio CV y postula.
 
 [![NPM Version](https://img.shields.io/npm/v/mcp-computrabajo?style=flat&logo=npm&logoColor=red)](https://www.npmjs.com/package/mcp-computrabajo)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**English** · [Español](README.es.md)
+[English](README.md) · **Español**
 
-## Connect
+## Conectar
 
-**Claude Desktop and claude.ai** — Settings → Connectors → Add custom connector:
+**Claude Desktop y claude.ai** — Configuración → Conectores → Agregar conector personalizado:
 
 ```
 https://mcp-computrabajo.georgegiosue.dev/mcp
@@ -21,94 +21,123 @@ https://mcp-computrabajo.georgegiosue.dev/mcp
 claude mcp add --transport http computrabajo https://mcp-computrabajo.georgegiosue.dev/mcp
 ```
 
-Connecting opens a page asking for your Computrabajo session cookie. It is only
-needed to read your CV and apply — choose **Skip — search only** to connect
-without one. The cookie is stored encrypted against that single connection and
-discarded when you disconnect.
+Al conectar se abre una página que pide tu cookie de sesión de Computrabajo.
+Solo se necesita para leer tu CV y postular — elige **Skip — search only** para
+conectarte sin ella. La cookie se guarda cifrada y asociada únicamente a esa
+conexión, y se descarta cuando la desconectas.
 
-To get it: sign in to Computrabajo, open DevTools → Network, right-click any
-request → Copy as cURL, and copy the value after `-b`. Anyone holding that
-cookie can act as you, so only paste one you generated yourself.
+Para obtenerla: inicia sesión en Computrabajo, abre DevTools → Network, haz clic
+derecho en cualquier petición → Copiar como cURL, y copia el valor después de
+`-b`. Quien tenga esa cookie puede actuar como tú, así que pega solo una que
+hayas generado tú.
 
-## What it looks like
+## Cómo se ve
 
-> **You:** Find backend jobs in Lima that actually match my CV.
+> **Tú:** Busca trabajos de backend en Lima que realmente encajen con mi CV.
 
-> **Claude:** Your CV is Full Stack — Rust, TypeScript, Angular, SQL Server, four years in. Of the 20 openings in Lima, 6 line up. The closest is Arquitecto de Software at EDPYME Inversiones La Cruz, posted 2 hours ago, hybrid in San Isidro. Want the full posting?
+> **Claude:** Tu CV es Full Stack — Rust, TypeScript, Angular, SQL Server, cuatro años. De las 20 vacantes en Lima, 6 calzan. La más cercana es Arquitecto de Software en EDPYME Inversiones La Cruz, publicada hace 2 horas, híbrido en San Isidro. ¿Te muestro la publicación completa?
 
-> **You:** Yes, and what's it pay?
+> **Tú:** Sí, ¿y cuánto paga?
 
-> **Claude:** No salary listed. It wants 5 years and a systems degree — you have the degree, you're a year short on experience. 2 vacancies, permanent contract.
+> **Claude:** No indica sueldo. Pide 5 años y título en sistemas — tienes el título, te falta un año de experiencia. 2 vacantes, contrato indefinido.
 
-> **You:** Apply to it.
+> **Tú:** Postula.
 
-> **Claude:** That submits MI_CV.pdf, your default CV, and can't be undone. Confirm?
+> **Claude:** Eso envía MI_CV.pdf, tu CV predeterminado, y no se puede deshacer. ¿Confirmas?
 
-## Tools
+## Herramientas
 
-| Tool | Does | Takes |
-|------|------|-------|
-| `search-jobs` | Search offers by keyword and location | `keyword`, `location?`, `country?`, `page?` |
-| `get-job-detail` | Full posting: description, salary, benefits, company | `offerId`, `country?` |
-| `get-profile` | Your CV: summary, experience, studies, languages, skills | `country?` |
-| `list-attached-cvs` | Your uploaded Word/PDF CVs and which is the default | `country?` |
-| `apply-to-job` | Submit your CV to an offer | `offerId`, `country?` |
+| Herramienta | Qué hace | Recibe |
+|-------------|----------|--------|
+| `search-jobs` | Busca ofertas por palabra clave y ubicación | `keyword`, `location?`, `country?`, `page?` |
+| `get-job-detail` | Publicación completa: descripción, sueldo, beneficios, empresa | `offerId`, `country?` |
+| `get-profile` | Tu CV: resumen, experiencia, estudios, idiomas, habilidades | `country?` |
+| `list-attached-cvs` | Tus CVs en Word/PDF subidos y cuál es el predeterminado | `country?` |
+| `get-application-questions` | Lee las preguntas y opciones actuales sin postular | `offerId`, `country?` |
+| `apply-to-job` | Envía tu CV y respuestas validadas a una oferta | `offerId`, `country?`, `answers?` |
 
-`get-profile`, `list-attached-cvs` and `apply-to-job` need the session cookie;
-searching does not. `country` is one of `pe`, `co`, `mx`, `ar`, `cl`, `ec` and
-defaults to `pe`.
+`get-profile`, `list-attached-cvs` y `apply-to-job` necesitan la cookie de
+sesión; buscar no. `country` es uno de `pe`, `co`, `mx`, `ar`, `cl`, `ec` y por
+defecto es `pe`.
 
-Keywords and locations are lowercase hyphenated slugs — `desarrollador-de-software`,
-`la-libertad-en-trujillo`. Computrabajo matches the keyword against the job title,
-so wording matters: for tech roles use `desarrollador-...`, `programador`,
-`analista-programador` or a bare noun like `software`. Avoid `ingeniero-de-software`
-— in Latin America that phrasing pulls civil, mechanical and mining postings.
+### Preguntas de selección
 
-## Run it yourself
+Primero consulta `get-application-questions`. La herramienta no envía la
+postulación y devuelve las preguntas, sus `questionId`, controles, opciones
+válidas y campos ocultos dinámicos. Después de revisar la oferta y las
+respuestas con la persona usuaria, llama a `apply-to-job` con:
 
-The npm package ships the same server over stdio:
-
-```bash
-claude mcp add computrabajo --env CT_COOKIES="<your cookie>" -- npx mcp-computrabajo@latest
+```json
+{
+  "offerId": "ID_DE_32_CARACTERES",
+  "country": "pe",
+  "answers": [
+    { "questionId": "availability", "answer": "immediate" },
+    { "questionId": "languages", "answer": ["es", "en"] }
+  ]
+}
 ```
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `CT_COOKIES` | — | Cookie string from your browser session |
-| `CT_COOKIES_FILE` | `~/.computrabajo/cookies.txt` | File holding the cookie instead |
-| `CT_COUNTRY` | `pe` | Default country code |
+El servidor comprueba que cada pregunta pertenezca al formulario actual, que
+las opciones existan, que no haya respuestas duplicadas y que las preguntas
+obligatorias estén contestadas. La confirmación humana debe ocurrir antes de
+la llamada de escritura. No se inventan respuestas ni se evaden CAPTCHA,
+antifraude, autenticación o límites de la plataforma.
 
-## Development
+Las palabras clave y ubicaciones son slugs en minúscula con guiones —
+`desarrollador-de-software`, `la-libertad-en-trujillo`. Computrabajo compara la
+palabra clave contra el título del puesto, así que la redacción importa: para
+roles técnicos usa `desarrollador-...`, `programador`, `analista-programador` o
+un sustantivo suelto como `software`. Evita `ingeniero-de-software` — en
+Latinoamérica esa forma trae avisos de civil, mecánica y minería.
+
+## Ejecutarlo tú mismo
+
+El paquete de npm publica el mismo servidor por stdio:
+
+```bash
+claude mcp add computrabajo --env CT_COOKIES="<tu cookie>" -- npx mcp-computrabajo@latest
+```
+
+| Variable | Default | Descripción |
+|----------|---------|-------------|
+| `CT_COOKIES` | — | Cadena de cookies de tu sesión del navegador |
+| `CT_COOKIES_FILE` | `~/.computrabajo/cookies.txt` | Archivo con la cookie, como alternativa |
+| `CT_COUNTRY` | `pe` | Código de país por defecto |
+
+## Desarrollo
 
 ```bash
 bun install
-bun run typecheck      # both entries: stdio and Worker
+bun run typecheck      # ambas entradas: stdio y Worker
 bun test
-bun run inspect        # MCP Inspector against the stdio server
-bun run dev:worker     # Worker on http://localhost:8787/mcp
-bun run deploy         # needs `wrangler login`
+bun run inspect        # MCP Inspector contra el servidor stdio
+bun run dev:worker     # Worker en http://localhost:8787/mcp
+bun run deploy         # requiere `wrangler login`
 ```
 
-First deploy only — create the KV namespace backing the OAuth grants and put its
-id in `wrangler.jsonc`:
+Solo la primera vez — crea el namespace de KV que respalda los permisos OAuth y
+coloca su id en `wrangler.jsonc`:
 
 ```bash
 bunx wrangler kv namespace create OAUTH_KV
 ```
 
-## Upgrading from 0.x
+## Migrar desde 0.x
 
-v1.0.0 is a breaking release: tool results are now wrapped (`{ jobs: [...] }`,
-`{ job: {...} }`) and exposed as MCP `structuredContent`; `country` is an enum
-rather than a free string; the server is built on MCP SDK v2; and the internal
-`Tool` wrapper, `findPackageJson` and `api.getCookies()` helpers are gone. Tool
-names and environment variables are unchanged.
+La v1.0.0 trae cambios incompatibles: los resultados vienen envueltos
+(`{ jobs: [...] }`, `{ job: {...} }`) y se exponen como `structuredContent` de
+MCP; `country` es un enum en vez de una cadena libre; el servidor está construido
+sobre el SDK v2 de MCP; y desaparecen el envoltorio `Tool`, `findPackageJson` y
+los helpers `api.getCookies()`. Los nombres de las herramientas y las variables
+de entorno no cambian.
 
-`apply-to-job` also reports honestly now. 0.x returned `success: true` for any
-HTTP 2xx, including responses where Computrabajo had refused the application;
-it now reports success only on the site's own `OfferAppliedOk` result code.
+`apply-to-job` además ahora reporta con honestidad. La 0.x devolvía
+`success: true` ante cualquier HTTP 2xx, incluso cuando Computrabajo había
+rechazado la postulación; ahora solo reporta éxito con el código `OfferAppliedOk`
+del propio sitio.
 
-## License
+## Licencia
 
-MIT — see [LICENSE](LICENSE). Not affiliated with Computrabajo. Issues and
-questions: [GitHub Issues](https://github.com/georgegiosue/mcp-computrabajo/issues).
+MIT — ver [LICENSE](LICENSE). Sin afiliación con Computrabajo. Dudas y
+problemas: [GitHub Issues](https://github.com/georgegiosue/mcp-computrabajo/issues).
