@@ -41,6 +41,48 @@ export const applicationResultSchema = z.object({
   message: z.string(),
 });
 
+export const applicationStatusSchema = z.enum([
+  "submitted",
+  "already_applied",
+  "needs_review",
+  "expired",
+  "session_expired",
+  "error",
+]);
+
+export const applicationQuestionOptionSchema = z.object({
+  value: z.string(),
+  label: z.string(),
+});
+
+export const applicationQuestionSchema = z.object({
+  questionId: z.string(),
+  name: z.string(),
+  label: z.string(),
+  controlType: z.enum(["text", "textarea", "select", "radio", "checkbox"]),
+  required: z.boolean(),
+  options: z.array(applicationQuestionOptionSchema),
+});
+
+export const applicationFormSchema = z.object({
+  offerId: z.string(),
+  submitUrl: z.string().optional(),
+  fields: z.array(
+    z.object({
+      name: z.string(),
+      value: z.string(),
+    }),
+  ),
+  questions: z.array(applicationQuestionSchema),
+  status: z.enum(["ready", "no_questions", "already_applied", "closed"]),
+});
+
+export const structuredApplicationResultSchema = z.object({
+  success: z.boolean(),
+  status: applicationStatusSchema,
+  message: z.string(),
+});
+
 export const experienceSchema = z.object({
   id: z.string(),
   title: z.string(),
@@ -90,6 +132,14 @@ export type JobListing = z.infer<typeof jobListingSchema>;
 export type Benefit = z.infer<typeof benefitSchema>;
 export type JobDetail = z.infer<typeof jobDetailSchema>;
 export type ApplicationResult = z.infer<typeof applicationResultSchema>;
+export type ApplicationQuestionOption = z.infer<
+  typeof applicationQuestionOptionSchema
+>;
+export type ApplicationQuestion = z.infer<typeof applicationQuestionSchema>;
+export type ApplicationForm = z.infer<typeof applicationFormSchema>;
+export type StructuredApplicationResult = z.infer<
+  typeof structuredApplicationResultSchema
+>;
 export type Experience = z.infer<typeof experienceSchema>;
 export type Education = z.infer<typeof educationSchema>;
 export type Language = z.infer<typeof languageSchema>;

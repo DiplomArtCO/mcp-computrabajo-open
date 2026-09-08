@@ -53,11 +53,36 @@ hayas generado tú.
 | `get-job-detail` | Publicación completa: descripción, sueldo, beneficios, empresa | `offerId`, `country?` |
 | `get-profile` | Tu CV: resumen, experiencia, estudios, idiomas, habilidades | `country?` |
 | `list-attached-cvs` | Tus CVs en Word/PDF subidos y cuál es el predeterminado | `country?` |
-| `apply-to-job` | Envía tu CV a una oferta | `offerId`, `country?` |
+| `get-application-questions` | Lee las preguntas y opciones actuales sin postular | `offerId`, `country?` |
+| `apply-to-job` | Envía tu CV y respuestas validadas a una oferta | `offerId`, `country?`, `answers?` |
 
 `get-profile`, `list-attached-cvs` y `apply-to-job` necesitan la cookie de
 sesión; buscar no. `country` es uno de `pe`, `co`, `mx`, `ar`, `cl`, `ec` y por
 defecto es `pe`.
+
+### Preguntas de selección
+
+Primero consulta `get-application-questions`. La herramienta no envía la
+postulación y devuelve las preguntas, sus `questionId`, controles, opciones
+válidas y campos ocultos dinámicos. Después de revisar la oferta y las
+respuestas con la persona usuaria, llama a `apply-to-job` con:
+
+```json
+{
+  "offerId": "ID_DE_32_CARACTERES",
+  "country": "pe",
+  "answers": [
+    { "questionId": "availability", "answer": "immediate" },
+    { "questionId": "languages", "answer": ["es", "en"] }
+  ]
+}
+```
+
+El servidor comprueba que cada pregunta pertenezca al formulario actual, que
+las opciones existan, que no haya respuestas duplicadas y que las preguntas
+obligatorias estén contestadas. La confirmación humana debe ocurrir antes de
+la llamada de escritura. No se inventan respuestas ni se evaden CAPTCHA,
+antifraude, autenticación o límites de la plataforma.
 
 Las palabras clave y ubicaciones son slugs en minúscula con guiones —
 `desarrollador-de-software`, `la-libertad-en-trujillo`. Computrabajo compara la

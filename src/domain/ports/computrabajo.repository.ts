@@ -23,7 +23,13 @@ export interface ComputrabajoRepository {
   applyToJob(params: {
     offerId: string;
     country?: CountryCode;
+    answers?: Array<{ questionId: string; answer: string | string[] }>;
   }): Promise<ApplicationResult>;
+
+  getApplicationForm(params: {
+    offerId: string;
+    country?: CountryCode;
+  }): Promise<import("../models/computrabajo.model").ApplicationForm>;
 
   getProfile(params: { country?: CountryCode }): Promise<Profile>;
 

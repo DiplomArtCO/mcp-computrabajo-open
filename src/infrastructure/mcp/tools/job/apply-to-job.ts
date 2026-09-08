@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { applicationResultSchema } from "../../../../domain/models/computrabajo.model";
+import { structuredApplicationResultSchema } from "../../../../domain/models/computrabajo.model";
 import { WRITE } from "../annotations";
 import { errorResponse } from "../error";
 import type { ToolRegistrar } from "../registrar";
@@ -11,6 +11,14 @@ const DESCRIPTION =
 const inputSchema = z.object({
   offerId: offerIdSchema,
   country: countrySchema,
+  answers: z
+    .array(
+      z.object({
+        questionId: z.string().min(1),
+        answer: z.union([z.string(), z.array(z.string()).min(1)]),
+      }),
+    )
+    .optional(),
 });
 
 export const register: ToolRegistrar = (server, repository) => {
@@ -20,16 +28,33 @@ export const register: ToolRegistrar = (server, repository) => {
       title: "Apply to Job",
       description: DESCRIPTION,
       inputSchema,
-      outputSchema: applicationResultSchema,
+      outputSchema: structuredApplicationResultSchema,
       annotations: WRITE,
     },
-    async ({ offerId, country }) => {
+    async ({ offerId, country, answers }) => {
       try {
-        const output = await repository.applyToJob({ offerId, country });
+        const output = await repository.applyToJob({
+          offerId,
+          country,
+          answers,
+        });
+        const lower = output.message.toLowerCase();
+        const status = output.success
+          ? "submitted"
+          : /already|ya postul|applied/.test(lower)
+            ? "already_applied"
+            : /session|cookie|logged|sesión/.test(lower)
+              ? "session_expired"
+              : /closed|valid|cerrad|no longer/.test(lower)
+                ? "expired"
+                : answers
+                  ? "needs_review"
+                  : "error";
+        const structured = { ...output, status } as const;
 
         return {
-          content: [{ type: "text", text: JSON.stringify(output) }],
-          structuredContent: output,
+          content: [{ type: "text", text: JSON.stringify(structured) }],
+          structuredContent: structured,
         };
       } catch (error) {
         return errorResponse(error);

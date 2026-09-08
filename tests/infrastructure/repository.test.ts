@@ -9,6 +9,7 @@ const fixture = (name: string) =>
 const SEARCH_HTML = fixture("search-lima.html");
 const PROFILE_HTML = fixture("profile.html");
 const CVS_HTML = fixture("attached-cvs.html");
+const APPLICATION_FORM_HTML = fixture("application-form.html");
 
 const realFetch = globalThis.fetch;
 afterEach(() => {
@@ -198,6 +199,78 @@ describe("applyToJob", () => {
     expect(new Headers(calls[0].init?.headers).get("cookie")).toBe(
       "SESSION=abc",
     );
+  });
+
+  test("validates and submits answers using the current form fields", async () => {
+    const calls = stubFetch(new Response(APPLICATION_FORM_HTML));
+    let requestCount = 0;
+    globalThis.fetch = (async (
+      url: string | URL | Request,
+      init?: RequestInit,
+    ) => {
+      requestCount++;
+      calls.push({ url: String(url), init });
+      return requestCount === 1
+        ? new Response(APPLICATION_FORM_HTML)
+        : new Response(JSON.stringify({ result: "OfferAppliedOk" }));
+    }) as typeof fetch;
+
+    const result = await new ComputrabajoHttpRepository({
+      cookies: "SESSION=abc",
+      defaultCountry: "pe",
+    }).applyToJob({
+      offerId: "A".repeat(32),
+      answers: [
+        { questionId: "salary", answer: "5000" },
+        { questionId: "availability", answer: "immediate" },
+        { questionId: "remote", answer: "yes" },
+      ],
+    });
+
+    expect(result.success).toBe(true);
+    const body = String(calls[1].init?.body);
+    expect(body).toContain("csrf=csrf-123");
+    expect(body).toContain("salary=5000");
+    expect(body).toContain("availability=immediate");
+  });
+
+  test("rejects an invalid option before submitting", async () => {
+    stubFetch(new Response(APPLICATION_FORM_HTML));
+    await expect(
+      new ComputrabajoHttpRepository({
+        cookies: "SESSION=abc",
+        defaultCountry: "pe",
+      }).applyToJob({
+        offerId: "A".repeat(32),
+        answers: [
+          { questionId: "salary", answer: "5000" },
+          { questionId: "availability", answer: "invalid" },
+          { questionId: "remote", answer: "yes" },
+        ],
+      }),
+    ).rejects.toThrow(/invalid option/i);
+  });
+});
+
+describe("getApplicationForm", () => {
+  test("normalizes hidden fields, text and option controls", async () => {
+    stubFetch(new Response(APPLICATION_FORM_HTML));
+    const form = await new ComputrabajoHttpRepository({
+      cookies: "SESSION=abc",
+      defaultCountry: "pe",
+    }).getApplicationForm({ offerId: "A".repeat(32) });
+
+    expect(form.status).toBe("ready");
+    expect(form.fields).toEqual([{ name: "csrf", value: "csrf-123" }]);
+    expect(form.questions.map((question) => question.questionId)).toEqual([
+      "salary",
+      "availability",
+      "remote",
+    ]);
+    expect(form.questions[1].options).toEqual([
+      { value: "immediate", label: "Immediate" },
+      { value: "30", label: "30 days" },
+    ]);
   });
 });
 

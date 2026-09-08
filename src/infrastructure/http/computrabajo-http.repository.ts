@@ -5,6 +5,8 @@ import {
   type CountryCode,
 } from "../../config/api";
 import type {
+  ApplicationForm,
+  ApplicationQuestion,
   ApplicationResult,
   AttachedCv,
   Benefit,
@@ -31,7 +33,12 @@ const SKILL_GROUPS = [
   { selector: ".jsOtherSkills", group: "other" },
 ] as const satisfies readonly { selector: string; group: Skill["group"] }[];
 
-type ApplyResponse = { type?: number; result?: string; message?: string };
+type ApplyResponse = {
+  type?: number;
+  result?: string;
+  message?: string;
+  html?: string;
+};
 
 const APPLY_OK = "offerappliedok";
 
@@ -47,6 +54,18 @@ const INVALID_SESSION =
 
 const MISSING_COOKIES =
   "No Computrabajo session cookie available. On the remote server, reconnect the connector and paste your session cookie when prompted. Running locally, set the CT_COOKIES environment variable.";
+
+function controlType(
+  tag: string,
+  type: string | undefined,
+): ApplicationQuestion["controlType"] | null {
+  if (tag === "textarea") return "textarea";
+  if (tag === "select") return "select";
+  if (type === "radio") return "radio";
+  if (type === "checkbox") return "checkbox";
+  if (type === "hidden" || type === "submit" || type === "button") return null;
+  return "text";
+}
 
 export class ComputrabajoHttpRepository implements ComputrabajoRepository {
   constructor(private readonly config: ComputrabajoConfig) {}
@@ -246,9 +265,11 @@ export class ComputrabajoHttpRepository implements ComputrabajoRepository {
   async applyToJob(params: {
     offerId: string;
     country?: CountryCode;
+    answers?: Array<{ questionId: string; answer: string | string[] }>;
   }): Promise<ApplicationResult> {
     const country = params.country || this.config.defaultCountry;
     const applyUrl = buildApplyUrl(country, params.offerId);
+    let targetUrl = applyUrl;
 
     const body = new URLSearchParams();
     body.append("url", applyUrl);
@@ -263,7 +284,55 @@ export class ComputrabajoHttpRepository implements ComputrabajoRepository {
     body.append("d", "33");
     body.append("lc", "ListOffers");
 
-    const res = await fetch(applyUrl, {
+    if (params.answers) {
+      const form = await this.getApplicationForm({
+        offerId: params.offerId,
+        country,
+      });
+      targetUrl = form.submitUrl || applyUrl;
+      const questions = new Map(
+        form.questions.map((question) => [question.questionId, question]),
+      );
+      const supplied = new Set<string>();
+      for (const answer of params.answers) {
+        const question = questions.get(answer.questionId);
+        if (!question)
+          throw new Error(`Unknown application question: ${answer.questionId}`);
+        if (supplied.has(answer.questionId)) {
+          throw new Error(`Duplicate application answer: ${answer.questionId}`);
+        }
+        supplied.add(answer.questionId);
+        const values = Array.isArray(answer.answer)
+          ? answer.answer
+          : [answer.answer];
+        if (question.required && values.every((value) => value.trim() === "")) {
+          throw new Error(
+            `Required application question is empty: ${answer.questionId}`,
+          );
+        }
+        if (question.options.length > 0) {
+          const allowed = new Set(
+            question.options.map((option) => option.value),
+          );
+          if (values.some((value) => !allowed.has(value))) {
+            throw new Error(
+              `Invalid option for application question: ${answer.questionId}`,
+            );
+          }
+        }
+        for (const value of values) body.append(question.name, value);
+      }
+      for (const question of form.questions) {
+        if (question.required && !supplied.has(question.questionId)) {
+          throw new Error(
+            `Missing required application question: ${question.questionId}`,
+          );
+        }
+      }
+      for (const field of form.fields) body.append(field.name, field.value);
+    }
+
+    const res = await fetch(targetUrl, {
       method: "POST",
       headers: {
         ...api.headers,
@@ -308,6 +377,211 @@ export class ComputrabajoHttpRepository implements ComputrabajoRepository {
         detail ||
         APPLY_ERRORS[code.toLowerCase()] ||
         `Computrabajo rejected the application: ${code || "unknown reason"}`,
+    };
+  }
+
+  async getApplicationForm(params: {
+    offerId: string;
+    country?: CountryCode;
+  }): Promise<ApplicationForm> {
+    const country = params.country || this.config.defaultCountry;
+    const applyUrl = buildApplyUrl(country, params.offerId);
+    const body = new URLSearchParams({
+      url: applyUrl,
+      urlLogin: `https://candidato.${country}.computrabajo.com/acceso/`,
+      ismobile: "false",
+      oi: params.offerId,
+      p: "280",
+      idb: "1",
+      d: "33",
+      lc: "ListOffers",
+    });
+    const res = await fetch(applyUrl, {
+      method: "POST",
+      headers: {
+        ...api.headers,
+        Accept: "application/json, text/javascript, */*; q=0.01",
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        Cookie: this.requireCookies(),
+        Origin: `https://${country}.computrabajo.com`,
+        Referer: `https://${country}.computrabajo.com/`,
+      },
+      body: body.toString(),
+    });
+    if (!res.ok) {
+      throw new Error(
+        `Application preflight failed: ${res.status} ${res.statusText}`,
+      );
+    }
+    const responseText = await res.text();
+    let response: ApplyResponse & { questions?: ApplicationQuestion[] };
+    try {
+      response = JSON.parse(responseText) as ApplyResponse & {
+        questions?: ApplicationQuestion[];
+      };
+    } catch {
+      response = {};
+    }
+    if (response.result?.toLowerCase() === "offerappliedok") {
+      return {
+        offerId: params.offerId,
+        fields: [],
+        questions: [],
+        status: "already_applied",
+      };
+    }
+    if (response.result?.toLowerCase() === "offerhaskq") {
+      const $ = cheerio.load(response.html || "");
+      const form = $("form[form-apply-kq]").first();
+      const fields = form
+        .find("input[type='hidden']")
+        .map((_, element) => ({
+          name: $(element).attr("name") || "",
+          value: $(element).attr("value") || "",
+        }))
+        .get()
+        .filter((field) => field.name.length > 0);
+      const questions = form
+        .find("[div-kq]")
+        .map((_, element) => {
+          const $element = $(element);
+          const index = $element.attr("data-div-kq-id") || "";
+          const prefix = `KillerQuestions[${index}]`;
+          const open = $element.find("textarea").first();
+          const radios = $element.find("input[type='radio']");
+          const firstHiddenId = form
+            .find(`[name='${prefix}.Id']`)
+            .first()
+            .attr("value");
+          const title = form
+            .find(`[name='${prefix}.Title']`)
+            .first()
+            .attr("value");
+          const options =
+            radios.length > 0
+              ? radios
+                  .map((__, input) => {
+                    const $input = $(input);
+                    return {
+                      value: $input.attr("value") || "",
+                      label: $input
+                        .closest("label")
+                        .text()
+                        .replace(/\s+/g, " ")
+                        .trim(),
+                    };
+                  })
+                  .get()
+              : [];
+          return {
+            questionId: firstHiddenId || index,
+            name:
+              open.length > 0
+                ? `${prefix}.OpenQuestion`
+                : `${prefix}.ClosedQuestion`,
+            label: title || $element.find("label").first().text().trim(),
+            controlType: open.length > 0 ? "textarea" : "radio",
+            required: true,
+            options,
+          } satisfies ApplicationQuestion;
+        })
+        .get();
+      const submitUrl = $("a[data-href-offer-apply]").attr(
+        "data-href-offer-apply",
+      );
+      return {
+        offerId: params.offerId,
+        submitUrl,
+        fields,
+        questions,
+        status: "ready",
+      };
+    }
+    const html = responseText;
+    const $ = cheerio.load(html);
+    const form = $("form")
+      .filter((_, element) => {
+        const action = $(element).attr("action") || "";
+        return (
+          action.includes("apply") || $(element).find("[name='oi']").length > 0
+        );
+      })
+      .first();
+
+    const pageText = $("body").text().replace(/\s+/g, " ").trim().toLowerCase();
+    if (/ya postulaste|already applied|postulación enviada/.test(pageText)) {
+      return {
+        offerId: params.offerId,
+        fields: [],
+        questions: [],
+        status: "already_applied",
+      };
+    }
+    if (/oferta no válida|offer is closed|ya no acepta/.test(pageText)) {
+      return {
+        offerId: params.offerId,
+        fields: [],
+        questions: [],
+        status: "closed",
+      };
+    }
+    if (form.length === 0) {
+      return {
+        offerId: params.offerId,
+        fields: [],
+        questions: [],
+        status: "no_questions",
+      };
+    }
+
+    const fields: Array<{ name: string; value: string }> = [];
+    const questions: ApplicationQuestion[] = [];
+    const seen = new Set<string>();
+    form.find("input, textarea, select").each((_, element) => {
+      const $element = $(element);
+      const name = ($element.attr("name") || "").trim();
+      if (!name) return;
+      const tag = element.tagName.toLowerCase();
+      const type = ($element.attr("type") || "").toLowerCase();
+      if (type === "hidden") {
+        fields.push({ name, value: $element.attr("value") || "" });
+        return;
+      }
+      const kind = controlType(tag, type);
+      if (!kind || seen.has(name)) return;
+      seen.add(name);
+      const labelFor = $element.attr("id");
+      const label = labelFor
+        ? $(`label[for='${labelFor}']`).first().text().trim()
+        : $element.closest("label").text().trim();
+      const options =
+        tag === "select"
+          ? $element
+              .find("option")
+              .map((__, option) => ({
+                value: $(option).attr("value") || "",
+                label: $(option).text().trim(),
+              }))
+              .get()
+              .filter((option) => option.value !== "")
+          : [];
+      questions.push({
+        questionId:
+          $element.attr("data-question-id") || $element.attr("id") || name,
+        name,
+        label: label || $element.attr("aria-label") || name,
+        controlType: kind,
+        required:
+          $element.is("[required]") ||
+          $element.attr("aria-required") === "true",
+        options,
+      });
+    });
+    return {
+      offerId: params.offerId,
+      fields,
+      questions,
+      status: questions.length > 0 ? "ready" : "no_questions",
     };
   }
 
