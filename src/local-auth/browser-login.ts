@@ -6,6 +6,7 @@ import type { SessionStore } from "./session-provider";
 
 const LOGIN_URL = "https://candidato.co.computrabajo.com/candidate/home";
 const SESSION_COOKIE_NAMES = new Set(["asp.net_sessionid", "uca", "ut"]);
+const LOGIN_TIMEOUT_MS = 5 * 60 * 1000;
 
 function cookieHeader(cookies: Cookie[]): string {
   return cookies.map(({ name, value }) => `${name}=${value}`).join("; ");
@@ -25,19 +26,22 @@ export async function loginWithBrowser(store: SessionStore): Promise<void> {
     console.error(
       "Completa el inicio de sesión en la ventana de Computrabajo. El agente no captura tu contraseña.",
     );
-    await page.waitForURL((url) => !url.pathname.includes("/acceso") && !url.pathname.includes("/login"), {
-      timeout: 5 * 60 * 1000,
-    });
+    const deadline = Date.now() + LOGIN_TIMEOUT_MS;
+    let validated: string | undefined;
 
-    const cookies = await context.cookies();
-    const sessionCookies = cookies.filter(({ name }) =>
-      SESSION_COOKIE_NAMES.has(name.toLowerCase()),
-    );
-    const value = cookieHeader(sessionCookies);
-    const validated = validateSessionCookies(value);
+    while (Date.now() < deadline) {
+      const cookies = await context.cookies();
+      const sessionCookies = cookies.filter(({ name }) =>
+        SESSION_COOKIE_NAMES.has(name.toLowerCase()),
+      );
+      validated = validateSessionCookies(cookieHeader(sessionCookies));
+      if (validated) break;
+      await page.waitForTimeout(1000);
+    }
+
     if (!validated) {
       throw new Error(
-        "No se detectó una sesión válida de Computrabajo. Completa el inicio de sesión e inténtalo de nuevo.",
+        "No se detectó una sesión válida después de 5 minutos. Completa el inicio de sesión e inténtalo de nuevo.",
       );
     }
 
