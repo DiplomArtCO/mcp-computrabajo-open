@@ -34,7 +34,7 @@
     "dist/src/*.d.ts"
   ],
   "scripts": {
-    "build": "rm -rf dist && bun build --target=node ./src/index.ts --outdir=dist/src && bun run build:declaration",
+    "build": "rm -rf dist && bun build --target=node ./src/index.ts --outdir=dist/src --external playwright --external keytar && bun run build:declaration",
     "build:declaration": "tsc --emitDeclarationOnly --project tsconfig.types.json",
     "format": "bunx biome check --write",
     "prepare": "husky",
@@ -61,6 +61,8 @@
     "@cloudflare/workers-oauth-provider": "0.10.3",
     "@modelcontextprotocol/server": "2.0.0",
     "cheerio": "1.2.0",
+    "keytar": "^7.9.0",
+    "playwright": "^1.63.0",
     "zod": "4.4.3"
   }
 }

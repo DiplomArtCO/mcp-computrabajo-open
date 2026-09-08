@@ -5,7 +5,7 @@ export const countrySchema = z
   .enum(COUNTRY_CODES)
   .optional()
   .describe(
-    "Two-letter country code: pe (Peru), co (Colombia), mx (Mexico), ar (Argentina), cl (Chile), ec (Ecuador). Defaults to the server's configured country ('pe' unless overridden).",
+    "Two-letter country code: pe (Peru), co (Colombia), mx (Mexico), ar (Argentina), cl (Chile), ec (Ecuador). Defaults to the server's configured country ('co' unless overridden).",
   );
 
 export const offerIdSchema = z

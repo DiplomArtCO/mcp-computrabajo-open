@@ -12,14 +12,16 @@ Repositorio publicado:
 
 ## Herramientas MCP
 
-| Herramienta | Función | Requiere sesión |
-|---|---|---|
-| `search-jobs` | Busca ofertas por palabra clave, ubicación y país | No |
-| `get-job-detail` | Obtiene descripción, requisitos, empresa y beneficios | No |
-| `get-profile` | Lee el perfil profesional autenticado | Sí |
-| `list-attached-cvs` | Lista CV adjuntos y marca el predeterminado | Sí |
-| `get-application-questions` | Consulta preguntas, opciones y campos dinámicos sin enviar respuestas | Sí |
-| `apply-to-job` | Envía una postulación con respuestas validadas | Sí |
+
+| Herramienta                 | Función                                                               | Requiere sesión |
+| --------------------------- | --------------------------------------------------------------------- | --------------- |
+| `search-jobs`               | Busca ofertas por palabra clave, ubicación y país                     | No              |
+| `get-job-detail`            | Obtiene descripción, requisitos, empresa y beneficios                 | No              |
+| `get-profile`               | Lee el perfil profesional autenticado                                 | Sí              |
+| `list-attached-cvs`         | Lista CV adjuntos y marca el predeterminado                           | Sí              |
+| `get-application-questions` | Consulta preguntas, opciones y campos dinámicos sin enviar respuestas | Sí              |
+| `apply-to-job`              | Envía una postulación con respuestas validadas                        | Sí              |
+
 
 Países admitidos: `pe`, `co`, `mx`, `ar`, `cl` y `ec`. El valor
 predeterminado es `pe`.
@@ -72,13 +74,13 @@ La primera solicitud a `/candidate/apply/` puede responder con:
 El HTML contiene:
 
 - Campos ocultos como `__RequestVerificationToken`, `EncryptedCvId`,
-  `EncryptedOfferId` y `EncryptedCandidateId`.
+`EncryptedOfferId` y `EncryptedCandidateId`.
 - Preguntas `KillerQuestions[n]`.
 - Preguntas abiertas en `KillerQuestions[n].OpenQuestion`.
 - Preguntas cerradas en `KillerQuestions[n].ClosedQuestion`.
 - Opciones en `KillerQuestions[n].DataOptions[n]`.
 - URL final en `data-href-offer-apply`, normalmente
-  `/candidate/kq/apply`.
+`/candidate/kq/apply`.
 
 El adaptador HTTP analiza ese HTML y conserva los campos ocultos necesarios
 para el segundo POST.
@@ -139,6 +141,8 @@ Estados esperados:
 - `session_expired`
 - `error`
 
+
+
 ## Seguridad
 
 - Nunca registrar cookies, contraseñas, tokens CSRF ni campos ocultos.
@@ -183,6 +187,8 @@ npm exec --yes bun -- run typecheck
 npm exec --yes bun -- run build
 ```
 
+
+
 ## Tests
 
 Los tests deben usar fixtures anonimizados o mocks. Deben cubrir como mínimo:
@@ -218,3 +224,15 @@ Antes de modificar el adaptador HTTP, revisar:
 Si Computrabajo cambia el contrato, capturar localmente la respuesta sin
 compartir cookies, agregar un fixture anonimizado, actualizar el parser y
 añadir una prueba de regresión antes de modificar el flujo de envío.
+
+
+
+## Uso obligatorio de Graphify
+
+Si existe `graphify-out/graph.json`, usar primero el grafo mediante
+
+`graphify query` para responder preguntas sobre arquitectura, relaciones,
+
+flujos o contenido del repositorio. No reconstruir el grafo ni leer archivos
+
+masivamente salvo que el grafo no contenga la información necesaria.

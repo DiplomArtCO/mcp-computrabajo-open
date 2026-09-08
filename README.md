@@ -58,7 +58,7 @@ hayas generado tú.
 
 `get-profile`, `list-attached-cvs` y `apply-to-job` necesitan la cookie de
 sesión; buscar no. `country` es uno de `pe`, `co`, `mx`, `ar`, `cl`, `ec` y por
-defecto es `pe`.
+defecto es `co`.
 
 ### Preguntas de selección
 
@@ -70,7 +70,7 @@ respuestas con la persona usuaria, llama a `apply-to-job` con:
 ```json
 {
   "offerId": "ID_DE_32_CARACTERES",
-  "country": "pe",
+  "country": "co",
   "answers": [
     { "questionId": "availability", "answer": "immediate" },
     { "questionId": "languages", "answer": ["es", "en"] }
@@ -99,11 +99,38 @@ El paquete de npm publica el mismo servidor por stdio:
 claude mcp add computrabajo --env CT_COOKIES="<tu cookie>" -- npx mcp-computrabajo@latest
 ```
 
+### MCP local sin copiar cookies
+
+Para iniciar sesión de forma asistida en una ventana visible del navegador:
+
+```bash
+npx playwright install chromium
+npx mcp-computrabajo@latest login
+```
+
+Completa el inicio de sesión directamente en Computrabajo. El agente no recibe
+ni almacena tu contraseña, y guarda la sesión en el almacén seguro del sistema
+operativo. Después configura tu cliente MCP para ejecutar:
+
+```bash
+npx mcp-computrabajo@latest
+```
+
+Comandos disponibles:
+
+```bash
+npx mcp-computrabajo@latest status
+npx mcp-computrabajo@latest logout
+```
+
+El flujo local es independiente del conector remoto. `CT_COOKIES` y
+`CT_COOKIES_FILE` siguen disponibles como alternativas para usuarios técnicos.
+
 | Variable | Default | Descripción |
 |----------|---------|-------------|
 | `CT_COOKIES` | — | Cadena de cookies de tu sesión del navegador |
 | `CT_COOKIES_FILE` | `~/.computrabajo/cookies.txt` | Archivo con la cookie, como alternativa |
-| `CT_COUNTRY` | `pe` | Código de país por defecto |
+| `CT_COUNTRY` | `co` | Código de país por defecto |
 
 ## Desarrollo
 

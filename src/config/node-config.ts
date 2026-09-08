@@ -7,6 +7,7 @@ import {
   DEFAULT_COUNTRY,
   isCountryCode,
 } from "./api";
+import { KeytarSessionStore } from "../local-auth/secure-store";
 
 const DEFAULT_COOKIE_FILE = join(homedir(), ".computrabajo", "cookies.txt");
 
@@ -28,9 +29,14 @@ function getDefaultCountry(): CountryCode {
   return country && isCountryCode(country) ? country : DEFAULT_COUNTRY;
 }
 
-export function loadConfig(): ComputrabajoConfig {
+export async function loadConfig(): Promise<ComputrabajoConfig> {
+  const configuredCookies = getCookies();
+  const cookies =
+    configuredCookies ||
+    (await new KeytarSessionStore().read().catch(() => undefined));
+
   return {
-    cookies: getCookies(),
+    cookies,
     defaultCountry: getDefaultCountry(),
   };
 }

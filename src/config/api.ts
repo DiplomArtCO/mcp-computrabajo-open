@@ -2,7 +2,7 @@ export const COUNTRY_CODES = ["pe", "co", "mx", "ar", "cl", "ec"] as const;
 
 export type CountryCode = (typeof COUNTRY_CODES)[number];
 
-export const DEFAULT_COUNTRY: CountryCode = "pe";
+export const DEFAULT_COUNTRY: CountryCode = "co";
 
 export type ComputrabajoConfig = {
   cookies?: string;

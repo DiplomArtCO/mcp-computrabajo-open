@@ -6,7 +6,7 @@ import type { ToolRegistrar } from "../registrar";
 import { countrySchema } from "../schemas";
 
 const DESCRIPTION =
-  "Search for job listings on Computrabajo by keyword and optional location. Returns a list of job offers with title, company, location, salary, and publication date. Computrabajo matches the keyword against the job title fairly literally, so the wording of the keyword decides the quality of the results — see the keyword parameter. Default country is Peru (pe).";
+  "Search for job listings on Computrabajo by keyword and optional location. Returns a list of job offers with title, company, location, salary, and publication date. Computrabajo matches the keyword against the job title fairly literally, so the wording of the keyword decides the quality of the results — see the keyword parameter. Default country is Colombia (co).";
 
 const inputSchema = z.object({
   keyword: z
