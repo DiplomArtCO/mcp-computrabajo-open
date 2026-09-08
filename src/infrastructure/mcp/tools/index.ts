@@ -6,6 +6,7 @@ import { register as getJobDetail } from "./job/get-job-detail";
 import { register as searchJobs } from "./job/search-jobs";
 import { register as getProfile } from "./profile/get-profile";
 import { register as listAttachedCvs } from "./profile/list-attached-cvs";
+import { register as sessionStatus } from "./session-status";
 
 const tools = [
   searchJobs,
@@ -14,6 +15,7 @@ const tools = [
   applyToJob,
   getProfile,
   listAttachedCvs,
+  sessionStatus,
 ];
 
 export function registerTools(

@@ -8,6 +8,8 @@ import type {
 } from "../models/computrabajo.model";
 
 export interface ComputrabajoRepository {
+  getSessionStatus(): Promise<"authenticated" | "missing">;
+
   searchJobs(params: {
     keyword: string;
     location?: string;

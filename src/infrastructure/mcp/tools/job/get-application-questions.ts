@@ -12,7 +12,7 @@ const inputSchema = z.object({
 
 export const register: ToolRegistrar = (server, repository) => {
   server.registerTool(
-    "get-application-questions",
+    "preguntas-de-postulacion",
     {
       title: "Get Application Questions",
       description:

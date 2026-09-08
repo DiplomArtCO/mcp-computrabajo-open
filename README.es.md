@@ -7,6 +7,16 @@ Servidor MCP para Computrabajo, la bolsa de empleo más grande de Latinoamérica
 
 [English](README.md) · **Español**
 
+## Experiencia conversacional
+
+El uso cotidiano ocurre en un cliente MCP compatible, mediante chat y sin
+consola. Consulta el [onboarding paso a paso](ONBOARDING.md) para conectar,
+iniciar sesión localmente una sola vez y resolver problemas.
+
+Ejemplos: “Busca ofertas de SST en Cali”, “revisa mi perfil” o “muéstrame las
+preguntas de esta oferta”. El asistente siempre consulta las preguntas actuales
+y solicita confirmación explícita antes de postular.
+
 ## Conectar
 
 **Claude Desktop y claude.ai** — Configuración → Conectores → Agregar conector personalizado:
@@ -49,23 +59,23 @@ hayas generado tú.
 
 | Herramienta | Qué hace | Recibe |
 |-------------|----------|--------|
-| `search-jobs` | Busca ofertas por palabra clave y ubicación | `keyword`, `location?`, `country?`, `page?` |
-| `get-job-detail` | Publicación completa: descripción, sueldo, beneficios, empresa | `offerId`, `country?` |
-| `get-profile` | Tu CV: resumen, experiencia, estudios, idiomas, habilidades | `country?` |
-| `list-attached-cvs` | Tus CVs en Word/PDF subidos y cuál es el predeterminado | `country?` |
-| `get-application-questions` | Lee las preguntas y opciones actuales sin postular | `offerId`, `country?` |
-| `apply-to-job` | Envía tu CV y respuestas validadas a una oferta | `offerId`, `country?`, `answers?` |
+| `buscar-ofertas` | Busca ofertas por palabra clave y ubicación | `keyword`, `location?`, `country?`, `page?` |
+| `detalle-de-oferta` | Publicación completa: descripción, sueldo, beneficios, empresa | `offerId`, `country?` |
+| `ver-mi-perfil` | Tu CV: resumen, experiencia, estudios, idiomas, habilidades | `country?` |
+| `listar-mis-cv` | Tus CVs en Word/PDF subidos y cuál es el predeterminado | `country?` |
+| `preguntas-de-postulacion` | Lee las preguntas y opciones actuales sin postular | `offerId`, `country?` |
+| `postular-a-oferta` | Envía tu CV y respuestas validadas a una oferta | `offerId`, `country?`, `answers?` |
 
-`get-profile`, `list-attached-cvs` y `apply-to-job` necesitan la cookie de
+`ver-mi-perfil`, `listar-mis-cv` y `postular-a-oferta` necesitan la cookie de
 sesión; buscar no. `country` es uno de `pe`, `co`, `mx`, `ar`, `cl`, `ec` y por
 defecto es `co`.
 
 ### Preguntas de selección
 
-Primero consulta `get-application-questions`. La herramienta no envía la
+Primero consulta `preguntas-de-postulacion`. La herramienta no envía la
 postulación y devuelve las preguntas, sus `questionId`, controles, opciones
 válidas y campos ocultos dinámicos. Después de revisar la oferta y las
-respuestas con la persona usuaria, llama a `apply-to-job` con:
+respuestas con la persona usuaria, llama a `postular-a-oferta` con:
 
 ```json
 {
@@ -159,7 +169,7 @@ sobre el SDK v2 de MCP; y desaparecen el envoltorio `Tool`, `findPackageJson` y
 los helpers `api.getCookies()`. Los nombres de las herramientas y las variables
 de entorno no cambian.
 
-`apply-to-job` además ahora reporta con honestidad. La 0.x devolvía
+`postular-a-oferta` además ahora reporta con honestidad. La 0.x devolvía
 `success: true` ante cualquier HTTP 2xx, incluso cuando Computrabajo había
 rechazado la postulación; ahora solo reporta éxito con el código `OfferAppliedOk`
 del propio sitio.

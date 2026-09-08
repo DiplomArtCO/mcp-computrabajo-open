@@ -30,6 +30,21 @@ function stubFetch(response: Response): Captured[] {
   return calls;
 }
 
+describe("getSessionStatus", () => {
+  test("does not expose session data and reports configured state", async () => {
+    const authenticated = new ComputrabajoHttpRepository({
+      cookies: "SESSION=redacted",
+      defaultCountry: "co",
+    });
+    const missing = new ComputrabajoHttpRepository({ defaultCountry: "co" });
+
+    await expect(authenticated.getSessionStatus()).resolves.toBe(
+      "authenticated",
+    );
+    await expect(missing.getSessionStatus()).resolves.toBe("missing");
+  });
+});
+
 describe("searchJobs", () => {
   test("parses listings out of the live HTML shape via cheerio/slim", async () => {
     stubFetch(new Response(SEARCH_HTML, { status: 200 }));

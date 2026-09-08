@@ -70,6 +70,10 @@ function controlType(
 export class ComputrabajoHttpRepository implements ComputrabajoRepository {
   constructor(private readonly config: ComputrabajoConfig) {}
 
+  async getSessionStatus(): Promise<"authenticated" | "missing"> {
+    return this.config.cookies ? "authenticated" : "missing";
+  }
+
   private requireCookies(): string {
     const { cookies } = this.config;
     if (!cookies) throw new Error(MISSING_COOKIES);

@@ -23,7 +23,7 @@ const inputSchema = z.object({
 
 export const register: ToolRegistrar = (server, repository) => {
   server.registerTool(
-    "apply-to-job",
+    "postular-a-oferta",
     {
       title: "Apply to Job",
       description: DESCRIPTION,

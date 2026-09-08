@@ -14,7 +14,7 @@ const outputSchema = z.object({ cvs: z.array(attachedCvSchema) });
 
 export const register: ToolRegistrar = (server, repository) => {
   server.registerTool(
-    "list-attached-cvs",
+    "listar-mis-cv",
     {
       title: "List Attached CVs",
       description: DESCRIPTION,

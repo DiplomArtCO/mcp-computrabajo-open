@@ -10,18 +10,18 @@ async function main(): Promise<void> {
   const command = process.argv[2];
   const store = new KeytarSessionStore();
 
-  if (command === "login") {
+  if (command === "iniciar-sesion" || command === "login") {
     await loginWithBrowser(store);
     return;
   }
 
-  if (command === "logout") {
+  if (command === "cerrar-sesion" || command === "logout") {
     await store.clear();
     console.error("Sesión local eliminada.");
     return;
   }
 
-  if (command === "status") {
+  if (command === "estado" || command === "status") {
     console.error(
       (await store.read()) ? "Sesión local disponible." : "No hay sesión local.",
     );

@@ -35,7 +35,7 @@ const outputSchema = z.object({
 
 export const register: ToolRegistrar = (server, repository) => {
   server.registerTool(
-    "search-jobs",
+    "buscar-ofertas",
     {
       title: "Search Jobs",
       description: DESCRIPTION,

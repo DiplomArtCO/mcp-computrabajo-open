@@ -14,7 +14,7 @@ const outputSchema = z.object({ profile: profileSchema });
 
 export const register: ToolRegistrar = (server, repository) => {
   server.registerTool(
-    "get-profile",
+    "ver-mi-perfil",
     {
       title: "Get My Profile",
       description: DESCRIPTION,
