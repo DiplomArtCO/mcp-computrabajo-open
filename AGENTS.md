@@ -10,6 +10,14 @@ Repositorio publicado:
 
 `https://github.com/DiplomArtCO/mcp-computrabajo-preguntas`
 
+Repositorio remoto autorizado para commits y pushes:
+
+`https://github.com/DiplomArtCO/mcp-computrabajo-preguntas`
+
+Usar siempre el remoto `github-copy` para publicar cambios de este proyecto.
+No hacer push a `origin` ni referenciar el repositorio original
+`georgegiosue/mcp-computrabajo`.
+
 ## Herramientas MCP
 
 
@@ -24,7 +32,23 @@ Repositorio publicado:
 
 
 Países admitidos: `pe`, `co`, `mx`, `ar`, `cl` y `ec`. El valor
-predeterminado es `pe`.
+predeterminado es `co`.
+
+## Experiencia de uso
+
+El producto se usa exclusivamente mediante conversación en un cliente MCP.
+No crear aplicaciones de escritorio, interfaces propias, launchers ni
+instaladores como parte de este repositorio. El README debe ser la guía
+principal para usuarios no técnicos.
+
+Las skills conversacionales deben:
+
+- Traducir lenguaje natural a las herramientas MCP apropiadas.
+- Guiar búsqueda, detalle, perfil y CV sin exigir nombres técnicos.
+- Consultar preguntas actuales antes de cualquier postulación.
+- Presentar preguntas y respuestas para revisión humana.
+- Exigir confirmación explícita antes de `apply-to-job`.
+- Informar estados de sesión sin revelar cookies, tokens o credenciales.
 
 ## Flujo de postulación
 
@@ -153,12 +177,10 @@ Estados esperados:
 - Una respuesta HTTP 200 no significa que la postulación fue enviada.
 - La postulación es irreversible y requiere confirmación humana.
 
-La sesión local esperada está en:
-
-`C:\Users\storr\.computrabajo\cookies.txt`
-
-El archivo debe contener únicamente el valor de la cabecera `Cookie`, no el
-comando cURL completo. Nunca mostrar su contenido.
+La sesión local preferida se administra mediante el navegador visible y el
+almacén seguro del sistema implementados en `src/local-auth/`. No mostrar
+cookies ni pedir al usuario que las copie. `CT_COOKIES` y `CT_COOKIES_FILE`
+solo son fallback para usuarios técnicos.
 
 ## Desarrollo local
 
