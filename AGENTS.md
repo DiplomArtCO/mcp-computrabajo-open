@@ -15,8 +15,7 @@ Repositorio remoto autorizado para commits y pushes:
 `https://github.com/DiplomArtCO/mcp-computrabajo-preguntas`
 
 Usar siempre el remoto `github-copy` para publicar cambios de este proyecto.
-No hacer push a `origin` ni referenciar el repositorio original
-`georgegiosue/mcp-computrabajo`.
+Los commits de producción deben publicarse en la rama `main`.
 
 ## Herramientas MCP
 
@@ -231,7 +230,7 @@ subdominio gratuito de Cloudflare:
 
 La configuración declarativa está en `wrangler.jsonc` y el pipeline está en
 `.github/workflows/deploy-worker.yml`. El pipeline despliega únicamente desde
-`master` después de pasar typecheck, tests y build. Requiere los secretos de
+`main` después de pasar typecheck, tests y build. Requiere los secretos de
 GitHub `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID`.
 
 El namespace KV OAuth propio se configura mediante el binding `OAUTH_KV`.
@@ -242,8 +241,8 @@ flujo autenticado.
 
 Estado de la implementación al 2026-09-09:
 
-- El workflow y la configuración de Worker ya están publicados en la rama
-  `feat/application-questions`.
+- El workflow, la configuración del Worker y el cambio de OAuth están
+  publicados en `main`.
 - El namespace KV `computrabajo-mcp-oauth` fue creado.
 - Tests, typecheck y build pasan localmente.
 - El Worker `computrabajo-mcp` fue desplegado correctamente en Cloudflare
@@ -261,8 +260,8 @@ Estado de la implementación al 2026-09-09:
 
 Orden obligatorio para continuar:
 
-1. Publicar los cambios en `main` para activar el despliegue de producción
-   mediante GitHub Actions.
+1. Verificar que el workflow de `main` termine correctamente para activar el
+   despliegue de producción mediante GitHub Actions.
 2. Desplegar el cambio del puente OAuth y probarlo con un cliente nuevo.
 3. Revisar logs sin exponer cookies, tokens, campos ocultos ni respuestas
    personales.
