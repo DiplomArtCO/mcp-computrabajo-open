@@ -17,6 +17,12 @@ jobs:
         with:
           bun-version: latest
       - run: bun install --frozen-lockfile
+      - name: Verify checkout and TypeScript dependencies
+        run: |
+          git rev-parse HEAD
+          bun --version
+          bun pm ls @types/node
+          node -e "const c=require('./tsconfig.json'); console.log(c.compilerOptions.types)"
       - run: bun run typecheck
       - run: bun test
       - run: bun run build
