@@ -209,6 +209,54 @@ npm exec --yes bun -- run typecheck
 npm exec --yes bun -- run build
 ```
 
+## Despliegue remoto desde GitHub
+
+La producción debe desplegarse desde el repositorio personal:
+
+`https://github.com/DiplomArtCO/mcp-computrabajo-preguntas`
+
+El Worker previsto se llama `computrabajo-mcp` y debe exponerse mediante el
+subdominio gratuito de Cloudflare:
+
+`https://computrabajo-mcp.<subdominio>.workers.dev/mcp`
+
+La configuración declarativa está en `wrangler.jsonc` y el pipeline está en
+`.github/workflows/deploy-worker.yml`. El pipeline despliega únicamente desde
+`master` después de pasar typecheck, tests y build. Requiere los secretos de
+GitHub `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID`.
+
+El namespace KV OAuth propio se configura mediante el binding `OAUTH_KV`.
+Nunca reutilizar un ID de KV de otra cuenta ni guardar tokens de Cloudflare en
+el repositorio. No anunciar la URL pública hasta que el Worker exista y se
+hayan verificado handshake MCP, descubrimiento OAuth, herramientas públicas y
+flujo autenticado.
+
+Estado de la implementación al 2026-09-09:
+
+- El workflow y la configuración de Worker ya están publicados en la rama
+  `feat/application-questions`.
+- El namespace KV `computrabajo-mcp-oauth` fue creado.
+- Tests, typecheck y build pasan localmente.
+- El Worker todavía requiere un despliegue autenticado en la cuenta Cloudflare.
+- La URL en README/ONBOARDING contiene `<subdominio>` como placeholder hasta
+  obtener la URL real de Wrangler.
+
+Orden obligatorio para continuar:
+
+1. Configurar `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID` localmente o como
+   secretos de GitHub.
+2. Fusionar `feat/application-questions` en `master` o desplegar solo para
+   validación con Wrangler.
+3. Ejecutar `wrangler deploy` y registrar la URL `workers.dev` resultante.
+4. Sustituir el placeholder de la URL en la documentación.
+5. Probar OAuth y MCP con un cliente nuevo antes de retirar la URL anterior.
+6. Revisar logs sin exponer cookies, tokens, campos ocultos ni respuestas
+   personales.
+
+No usar una redirección HTTP simple como sustituto de la migración OAuth.
+Mantener la URL anterior temporalmente solo si sigue bajo control y retirarla
+después de validar el endpoint nuevo.
+
 
 
 ## Tests
