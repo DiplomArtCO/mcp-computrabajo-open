@@ -22,12 +22,12 @@ Los commits de producción deben publicarse en la rama `main`.
 
 | Herramienta                 | Función                                                               | Requiere sesión |
 | --------------------------- | --------------------------------------------------------------------- | --------------- |
-| `search-jobs`               | Busca ofertas por palabra clave, ubicación y país                     | No              |
-| `get-job-detail`            | Obtiene descripción, requisitos, empresa y beneficios                 | No              |
-| `get-profile`               | Lee el perfil profesional autenticado                                 | Sí              |
-| `list-attached-cvs`         | Lista CV adjuntos y marca el predeterminado                           | Sí              |
-| `get-application-questions` | Consulta preguntas, opciones y campos dinámicos sin enviar respuestas | Sí              |
-| `apply-to-job`              | Envía una postulación con respuestas validadas                        | Sí              |
+| `buscar-ofertas`            | Busca ofertas por palabra clave, ubicación y país                     | No              |
+| `detalle-de-oferta`         | Obtiene descripción, requisitos, empresa y beneficios                 | No              |
+| `ver-mi-perfil`             | Lee el perfil profesional autenticado                                 | Sí              |
+| `listar-mis-cv`             | Lista CV adjuntos y marca el predeterminado                           | Sí              |
+| `preguntas-de-postulacion`  | Consulta preguntas, opciones y campos dinámicos sin enviar respuestas | Sí              |
+| `postular-a-oferta`         | Envía una postulación con respuestas validadas                        | Sí              |
 
 
 Países admitidos: `pe`, `co`, `mx`, `ar`, `cl` y `ec`. El valor
@@ -258,12 +258,33 @@ Estado de la implementación al 2026-09-09:
 - El cambio del puente local está validado localmente, pero todavía requiere
   un nuevo despliegue del Worker antes de probarlo contra la URL pública.
 
+Estado actualizado al 2026-09-10:
+
+- El commit `ace3e4d` fue publicado en `main` mediante `github-copy`.
+- El tag `v1.0.1` fue publicado en GitHub para activar el workflow de npm.
+- El paquete `1.0.1` fue validado localmente desde un tarball limpio: incluye
+  el bundle compilado y las 12 skills.
+- La suite local queda en 56 tests, con typecheck, build, `wrangler
+  types --check` y `wrangler deploy --dry-run` exitosos.
+- Se añadieron validaciones para keyword vacía, página menor que uno, campos
+  ocultos redactados, desafíos OAuth UUID y modo `CT_DISABLE_LOCAL_SESSION=1`.
+- La publicación efectiva en npm sigue pendiente porque el entorno local no
+  está autenticado (`ENEEDAUTH`). El workflow `.github/workflows/publish-npm.yml`
+  requiere `NPM_TOKEN`.
+- El despliegue efectivo del Worker y la aceptación remota siguen pendientes
+  de los secretos de GitHub `CLOUDFLARE_API_TOKEN` y
+  `CLOUDFLARE_ACCOUNT_ID`; `wrangler whoami` local no está autenticado.
+- No anunciar la versión pública corregida ni ejecutar una prueba autenticada
+  contra producción hasta confirmar npm `1.0.1`, el Worker actualizado y una
+  cuenta de prueba aislada.
+
 Orden obligatorio para continuar:
 
-1. Verificar que el workflow de `main` termine correctamente para activar el
-   despliegue de producción mediante GitHub Actions.
-2. Desplegar el cambio del puente OAuth y probarlo con un cliente nuevo.
-3. Revisar logs sin exponer cookies, tokens, campos ocultos ni respuestas
+1. Verificar que los workflows de `main` y `v1.0.1` terminen correctamente.
+2. Confirmar npm `1.0.1` y desplegar el cambio OAuth al Worker desde `main`.
+3. Probar handshake, OAuth, herramientas públicas y sesión con una cuenta de
+   prueba aislada.
+4. Revisar logs sin exponer cookies, tokens, campos ocultos ni respuestas
    personales.
 
 No usar una redirección HTTP simple como sustituto de la migración OAuth.
