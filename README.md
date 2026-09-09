@@ -32,16 +32,22 @@ capacidades mediante chat y las herramientas MCP.
 
 ## Conectar
 
+El servidor remoto se despliega desde este repositorio en Cloudflare Workers.
+La URL de producción usa el subdominio gratuito de Cloudflare:
+`https://computrabajo-mcp.<tu-subdominio>.workers.dev/mcp`. Sustituye
+`<tu-subdominio>` por el identificador de tu cuenta cuando el Worker quede
+desplegado.
+
 **Claude Desktop y claude.ai** — Configuración → Conectores → Agregar conector personalizado:
 
 ```
-https://mcp-computrabajo.georgegiosue.dev/mcp
+https://computrabajo-mcp.<tu-subdominio>.workers.dev/mcp
 ```
 
 **Claude Code**
 
 ```bash
-claude mcp add --transport http computrabajo https://mcp-computrabajo.georgegiosue.dev/mcp
+claude mcp add --transport http computrabajo https://computrabajo-mcp.<tu-subdominio>.workers.dev/mcp
 ```
 
 Al conectar se abre una página que pide tu cookie de sesión de Computrabajo.
@@ -166,6 +172,10 @@ bun run dev:worker     # Worker en http://localhost:8787/mcp
 bun run deploy         # requiere `wrangler login`
 ```
 
+Los pushes a `master` ejecutan las validaciones y despliegan el Worker mediante
+`.github/workflows/deploy-worker.yml`. El repositorio necesita los secretos
+`CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID` configurados en GitHub.
+
 Solo la primera vez — crea el namespace de KV que respalda los permisos OAuth y
 coloca su id en `wrangler.jsonc`:
 
@@ -190,4 +200,4 @@ del propio sitio.
 ## Licencia
 
 MIT — ver [LICENSE](LICENSE). Sin afiliación con Computrabajo. Dudas y
-problemas: [GitHub Issues](https://github.com/georgegiosue/mcp-computrabajo/issues).
+problemas: [GitHub Issues](https://github.com/DiplomArtCO/mcp-computrabajo-preguntas/issues).

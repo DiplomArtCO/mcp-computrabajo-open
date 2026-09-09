@@ -22,7 +22,7 @@ el chat y las herramientas MCP.
 En Claude Desktop, claude.ai u otro cliente MCP compatible, abre la sección
 de conectores y agrega:
 
-`https://mcp-computrabajo.georgegiosue.dev/mcp`
+`https://computrabajo-mcp.<tu-subdominio>.workers.dev/mcp`
 
 Después escribe en el chat, por ejemplo:
 

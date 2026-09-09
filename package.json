@@ -27,7 +27,7 @@
     "scraping",
     "claude"
   ],
-  "author": "George Giosue",
+  "author": "DiplomArtCO",
   "license": "MIT",
   "files": [
     "dist/src/*.js",

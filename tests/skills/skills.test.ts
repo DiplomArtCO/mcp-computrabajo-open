@@ -29,7 +29,9 @@ test("the installer is packaged and supports safe opt-out", async () => {
     "utf8",
   );
 
-  expect(packageJson).toContain('"postinstall": "node scripts/install-skills.mjs"');
+  expect(packageJson).toContain(
+    '"postinstall": "node scripts/install-skills.mjs"',
+  );
   expect(packageJson).toContain('"scripts/install-skills.mjs"');
   expect(installer).toContain("CT_INSTALL_SKILLS");
   expect(installer).toContain("--uninstall");

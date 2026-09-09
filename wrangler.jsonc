@@ -1,20 +1,17 @@
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "mcp-computrabajo",
-	"main": "src/worker.ts",
-	"compatibility_date": "2026-08-01",
-	"compatibility_flags": [
-		"nodejs_compat",
-		"global_fetch_strictly_public"
-	],
-	"kv_namespaces": [
-		{
-			"binding": "OAUTH_KV",
-			"id": "cf2bf2d86bb941c3a1813f9582bf5913",
-			"remote": true
-		}
-	],
-	"observability": {
-		"enabled": true
-	}
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "computrabajo-mcp",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "kv_namespaces": [
+    {
+      "binding": "OAUTH_KV",
+      "id": "5d366eb21b424183b6710392bc2164bb",
+      "remote": true
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
 }

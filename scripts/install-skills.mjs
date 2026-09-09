@@ -1,12 +1,11 @@
-import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const packageRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 const sourceRoot = join(packageRoot, "skills");
-const configRoot =
-  process.env.CLAUDE_CONFIG_DIR || join(homedir(), ".claude");
+const configRoot = process.env.CLAUDE_CONFIG_DIR || join(homedir(), ".claude");
 const targetRoot = join(configRoot, "skills");
 const manifestPath = join(targetRoot, ".mcp-computrabajo.json");
 const marker = "<!-- Managed by mcp-computrabajo. Do not edit this line. -->";
@@ -28,11 +27,7 @@ async function readManifest() {
 
 async function install() {
   const entries = (await readdir(sourceRoot, { withFileTypes: true }))
-    .filter(
-      (entry) =>
-        entry.isFile() &&
-        entry.name.endsWith(".md") &&
-    )
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
     .map((entry) => entry.name);
 
   await mkdir(targetRoot, { recursive: true });
