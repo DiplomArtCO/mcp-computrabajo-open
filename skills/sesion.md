@@ -1,3 +1,8 @@
+---
+name: sesion
+description: Diagnostica la sesión de Computrabajo sin exponer secretos.
+---
+
 # Sesión
 
 Llama a `estado-de-sesion` cuando la persona pregunte si está conectada o

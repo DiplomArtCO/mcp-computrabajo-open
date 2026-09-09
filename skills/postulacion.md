@@ -1,3 +1,8 @@
+---
+name: postulacion
+description: Flujo conversacional seguro para revisar y enviar postulaciones.
+---
+
 # Postulación segura
 
 1. Confirma la oferta exacta y consulta `detalle-de-oferta`.

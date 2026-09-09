@@ -1,3 +1,8 @@
+---
+name: evaluacion
+description: Evalúa una oferta completa frente al perfil del candidato.
+---
+
 # Evaluación
 
 Para una oferta seleccionada llama a `detalle-de-oferta` con el `offerId`

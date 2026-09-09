@@ -1,3 +1,8 @@
+---
+name: perfil
+description: Consulta el perfil y los CV del candidato autenticado.
+---
+
 # Perfil y CV
 
 Cuando la persona pregunte por su perfil, llama primero a `estado-de-sesion`.

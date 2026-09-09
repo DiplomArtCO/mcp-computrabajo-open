@@ -5,7 +5,7 @@ Servidor MCP para Computrabajo, la bolsa de empleo más grande de Latinoamérica
 [![NPM Version](https://img.shields.io/npm/v/mcp-computrabajo?style=flat&logo=npm&logoColor=red)](https://www.npmjs.com/package/mcp-computrabajo)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[English](README.md) · **Español**
+**Documentación en español**
 
 ## Experiencia conversacional
 
@@ -16,6 +16,19 @@ iniciar sesión localmente una sola vez y resolver problemas.
 Ejemplos: “Busca ofertas de SST en Cali”, “revisa mi perfil” o “muéstrame las
 preguntas de esta oferta”. El asistente siempre consulta las preguntas actuales
 y solicita confirmación explícita antes de postular.
+
+Al instalar el paquete, las skills conversacionales quedan disponibles para
+clientes con soporte de skills, como Claude Code, Cursor y Codex. En Claude
+Code se instalan automáticamente en `~/.claude/skills/`; en Cursor, Codex u
+otros clientes deben copiarse o registrarse según el directorio de skills que
+utilice cada cliente. El paquete también las publica en `skills/*.md` para
+facilitar esa instalación.
+
+Los nombres disponibles son `/buscar-ofertas`, `/detalle-de-oferta`,
+`/preguntas-de-postulacion`, `/postular-a-oferta`, `/ver-mi-perfil`,
+`/listar-mis-cv` y `/estado-de-sesion`. Desactiva la instalación automática
+con `CT_INSTALL_SKILLS=0`. Si el cliente no admite skills, usa estas mismas
+capacidades mediante chat y las herramientas MCP.
 
 ## Conectar
 

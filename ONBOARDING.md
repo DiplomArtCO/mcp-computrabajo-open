@@ -1,5 +1,22 @@
 # Usar Computrabajo conversando
 
+## Skills de Claude Code
+
+La instalación del paquete instala automáticamente las skills globales en
+`~/.claude/skills/`. Invócalas con `/buscar-ofertas`,
+`/detalle-de-oferta`, `/preguntas-de-postulacion`, `/postular-a-oferta`,
+`/ver-mi-perfil`, `/listar-mis-cv` o `/estado-de-sesion`.
+
+Para entornos CI o instalaciones que solo necesiten el servidor MCP, usa
+`CT_INSTALL_SKILLS=0`. Para eliminar las skills administradas:
+
+```bash
+node node_modules/mcp-computrabajo/scripts/install-skills.mjs --uninstall
+```
+
+En clientes distintos de Claude Code, las mismas funciones se usan mediante
+el chat y las herramientas MCP.
+
 ## Conectar sin consola durante el uso normal
 
 En Claude Desktop, claude.ai u otro cliente MCP compatible, abre la sección

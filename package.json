@@ -33,6 +33,7 @@
     "dist/src/*.js",
     "dist/src/*.d.ts",
     "ONBOARDING.md",
+    "scripts/install-skills.mjs",
     "skills/*.md"
   ],
   "scripts": {
@@ -40,6 +41,7 @@
     "build:declaration": "tsc --emitDeclarationOnly --project tsconfig.types.json",
     "format": "bunx biome check --write",
     "prepare": "husky",
+    "postinstall": "node scripts/install-skills.mjs",
     "prepublishOnly": "bun run build",
     "inspect": "bunx @modelcontextprotocol/inspector bun src/index.ts",
     "typecheck": "bun run cf-typegen && tsc --noEmit --project tsconfig.json && tsc --noEmit --project tsconfig.worker.json",

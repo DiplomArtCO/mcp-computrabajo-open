@@ -1,4 +1,9 @@
-# Descubrimiento
+---
+name: descubrimiento
+description: Busca y preselecciona ofertas de empleo.
+---
+
+# Buscar ofertas
 
 Usa `buscar-ofertas` cuando la persona pida encontrar empleo. Extrae o
 pregunta palabra clave, ubicación, país y página; convierte palabras y
