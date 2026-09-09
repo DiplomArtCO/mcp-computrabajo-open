@@ -30,6 +30,18 @@ Después escribe en el chat, por ejemplo:
 - “Muéstrame el detalle de la segunda oferta.”
 - “¿Puedes revisar mi perfil y mis CV?”
 
+Para autenticar el conector remoto sin copiar cookies, ejecuta en una
+terminal:
+
+```bash
+npx mcp-computrabajo@latest iniciar-sesion-remota
+```
+
+Luego pulsa **Iniciar sesión automáticamente** en la autorización OAuth y
+completa el acceso en la ventana visible de Computrabajo. El puente local
+entrega la sesión mediante HTTPS y un desafío de un solo uso; nunca muestra
+la cookie.
+
 La búsqueda y los detalles públicos funcionan sin sesión. Para perfil, CV,
 preguntas de selección y postulaciones se necesita una sesión local.
 

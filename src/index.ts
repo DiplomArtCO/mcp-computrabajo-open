@@ -4,6 +4,7 @@ import { loadConfig } from "./config/node-config";
 import { ComputrabajoHttpRepository } from "./infrastructure/http/computrabajo-http.repository";
 import { startServer } from "./infrastructure/mcp/stdio";
 import { loginWithBrowser } from "./local-auth/browser-login";
+import { startRemoteLogin } from "./local-auth/remote-login";
 import { KeytarSessionStore } from "./local-auth/secure-store";
 
 async function main(): Promise<void> {
@@ -12,6 +13,11 @@ async function main(): Promise<void> {
 
   if (command === "iniciar-sesion" || command === "login") {
     await loginWithBrowser(store);
+    return;
+  }
+
+  if (command === "iniciar-sesion-remota" || command === "remote-login") {
+    await startRemoteLogin();
     return;
   }
 

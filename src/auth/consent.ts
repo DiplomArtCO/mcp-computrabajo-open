@@ -102,6 +102,7 @@ kbd {
   color: var(--fg);
 }
 .actions { display: flex; gap: 8px; margin-top: 18px; }
+a.primary { flex: 1; padding: 9px 14px; border-radius: 7px; font-size: 13.5px; font-weight: 600; text-align: center; text-decoration: none; background: var(--accent); color: var(--accent-fg); }
 button {
   padding: 9px 14px;
   border-radius: 7px;
@@ -126,11 +127,17 @@ export function renderConsentPage(params: {
   clientName: string;
   action: string;
   lang: Lang;
+  remoteLoginUrl: string;
+  statusUrl: string;
+  challenge: string;
   error?: CookieError;
 }): string {
   const t = COPY[params.lang];
   const client = escapeHtml(params.clientName);
   const error = params.error ? escapeHtml(t.errors[params.error]) : "";
+  const remoteLoginUrl = escapeHtml(params.remoteLoginUrl);
+  const statusUrl = escapeHtml(params.statusUrl);
+  const challenge = escapeHtml(params.challenge);
 
   return `<!doctype html>
 <html lang="${t.htmlLang}">
@@ -147,6 +154,11 @@ export function renderConsentPage(params: {
   <p class="lead">${t.lead(client)}</p>
   ${error ? `<p class="alert" role="alert">${error}</p>` : ""}
   <form method="post" action="${escapeHtml(params.action)}">
+    <input type="hidden" name="grant" value="auto">
+    <input type="hidden" name="challenge" value="${challenge}">
+    <div class="actions">
+      <a class="primary" href="${remoteLoginUrl}">${t.browserLogin}</a>
+    </div>
     <div class="row">
       <label for="cookies">${t.label}</label>
       <span class="opt">${t.optional}</span>
@@ -167,6 +179,19 @@ export function renderConsentPage(params: {
   </form>
   <footer>${t.footer}</footer>
 </main>
+<script>
+const form = document.querySelector("form");
+const statusUrl = ${JSON.stringify(statusUrl)};
+const poll = async () => {
+  try {
+    const response = await fetch(statusUrl, { credentials: "same-origin" });
+    const data = await response.json();
+    if (data.status === "ready") form.requestSubmit();
+    else if (data.status === "pending") setTimeout(poll, 1000);
+  } catch (_) {}
+};
+poll();
+</script>
 </body>
 </html>`;
 }

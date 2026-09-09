@@ -5,9 +5,18 @@ import { json, withCors } from "../shared/cors";
 import { renderConsentPage } from "./consent";
 import { checkCookieInput } from "./cookie-input";
 import { ERROR_PAGE, type Lang, pickLang } from "./i18n";
+import {
+  claimSession,
+  SESSION_KEY_PREFIX,
+  SESSION_TTL_SECONDS,
+  sessionStatus,
+  type PendingSession,
+} from "./remote-session";
 
 const MCP_PATH = "/mcp";
 const AUTHORIZE_PATH = "/authorize";
+const SESSION_CLAIM_PATH = "/session/claim";
+const SESSION_STATUS_PATH = "/session/status";
 
 function html(body: string, status = 200): Response {
   return new Response(body, {
@@ -25,9 +34,32 @@ async function handleAuthorize(request: Request, env: Env): Promise<Response> {
   const clientName = client?.clientName || client?.clientId || "MCP client";
   const action = new URL(request.url).search;
   const lang = pickLang(request.headers.get("accept-language"));
+  const challenge = crypto.randomUUID();
+  const sessionKey = `${SESSION_KEY_PREFIX}${challenge}`;
+  const statusUrl = `${new URL(request.url).origin}${SESSION_STATUS_PATH}?challenge=${encodeURIComponent(challenge)}`;
+  const remoteLoginUrl = `http://127.0.0.1:8765/login?server=${encodeURIComponent(
+    new URL(request.url).origin,
+  )}&challenge=${encodeURIComponent(challenge)}`;
+
+  await env.OAUTH_KV.put(
+    sessionKey,
+    JSON.stringify({
+      authUrl: request.url,
+      clientId: oauthRequest.clientId,
+      createdAt: Date.now(),
+    } satisfies PendingSession),
+    { expirationTtl: SESSION_TTL_SECONDS },
+  );
 
   if (request.method === "GET") {
-    return html(renderConsentPage({ clientName, action, lang }));
+    return html(renderConsentPage({
+      clientName,
+      action,
+      lang,
+      remoteLoginUrl,
+      statusUrl,
+      challenge,
+    }));
   }
 
   const form = await request.formData();
@@ -35,14 +67,41 @@ async function handleAuthorize(request: Request, env: Env): Promise<Response> {
   const pasted = form.get("cookies");
   let cookies: string | undefined;
 
-  if (grant === "full") {
+  if (grant === "auto") {
+    const submittedChallenge = form.get("challenge");
+    const pending = typeof submittedChallenge === "string"
+      ? await env.OAUTH_KV.get<PendingSession>(
+          `${SESSION_KEY_PREFIX}${submittedChallenge}`,
+          "json",
+        )
+      : null;
+    if (pending?.cookies) {
+      cookies = pending.cookies;
+      await env.OAUTH_KV.delete(`${SESSION_KEY_PREFIX}${submittedChallenge}`);
+    } else {
+      return html(renderConsentPage({
+        clientName,
+        action,
+        lang,
+        remoteLoginUrl,
+        statusUrl,
+        challenge,
+        error: "empty",
+      }), 400);
+    }
+  } else if (grant === "full") {
     const checked = checkCookieInput(typeof pasted === "string" ? pasted : "");
 
     if (!checked.ok) {
-      return html(
-        renderConsentPage({ clientName, action, lang, error: checked.error }),
-        400,
-      );
+      return html(renderConsentPage({
+        clientName,
+        action,
+        lang,
+        remoteLoginUrl,
+        statusUrl,
+        challenge,
+        error: checked.error,
+      }), 400);
     }
 
     cookies = checked.cookies;
@@ -113,6 +172,14 @@ export const AuthHandler = {
           pickLang(request.headers.get("accept-language")),
         );
       }
+    }
+
+    if (pathname === SESSION_CLAIM_PATH) {
+      return await claimSession(request, env.OAUTH_KV);
+    }
+
+    if (pathname === SESSION_STATUS_PATH) {
+      return await sessionStatus(request, env.OAUTH_KV);
     }
 
     if (pathname === "/" && request.method === "GET") {

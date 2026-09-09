@@ -48,10 +48,22 @@ https://computrabajo-mcp.torres-sergio2205.workers.dev/mcp
 claude mcp add --transport http computrabajo https://computrabajo-mcp.torres-sergio2205.workers.dev/mcp
 ```
 
-Al conectar se abre una página que pide tu cookie de sesión de Computrabajo.
-Solo se necesita para leer tu CV y postular — elige **Skip — search only** para
-conectarte sin ella. La cookie se guarda cifrada y asociada únicamente a esa
-conexión, y se descarta cuando la desconectas.
+Al conectar se abre una página de autorización. Para autenticarte sin copiar
+cookies, ejecuta en otra terminal:
+
+```bash
+npx mcp-computrabajo@latest iniciar-sesion-remota
+```
+
+Después pulsa **Iniciar sesión automáticamente** en la página OAuth y
+completa el acceso en la ventana visible de Computrabajo. La sesión se
+transfiere cifrada por HTTPS mediante un desafío de un solo uso; el puente
+local no imprime ni muestra la cookie. Elige **Solo buscar** para conectarte
+sin sesión.
+
+La opción de pegar una cookie completa se conserva únicamente como fallback
+para usuarios técnicos. La cookie se guarda cifrada y asociada únicamente a
+esa conexión, y se descarta cuando la desconectas.
 
 Para obtenerla: inicia sesión en Computrabajo, abre DevTools → Network, haz clic
 derecho en cualquier petición → Copiar como cURL, y copia el valor después de
@@ -150,7 +162,8 @@ npx mcp-computrabajo@latest status
 npx mcp-computrabajo@latest logout
 ```
 
-El flujo local es independiente del conector remoto. `CT_COOKIES` y
+El flujo local es independiente del conector remoto. Para el conector remoto
+usa `iniciar-sesion-remota`. `CT_COOKIES` y
 `CT_COOKIES_FILE` siguen disponibles como alternativas para usuarios técnicos.
 
 | Variable | Default | Descripción |

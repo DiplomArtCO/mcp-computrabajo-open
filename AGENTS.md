@@ -49,6 +49,9 @@ Las skills conversacionales deben:
 - Presentar preguntas y respuestas para revisión humana.
 - Exigir confirmación explícita antes de `apply-to-job`.
 - Informar estados de sesión sin revelar cookies, tokens o credenciales.
+- Para el conector remoto, recomendar `iniciar-sesion-remota`, que abre el
+  navegador local y transfiere la sesión mediante un desafío efímero. No pedir
+  cookies manualmente salvo como fallback técnico.
 
 ## Flujo de postulación
 
@@ -182,6 +185,12 @@ almacén seguro del sistema implementados en `src/local-auth/`. No mostrar
 cookies ni pedir al usuario que las copie. `CT_COOKIES` y `CT_COOKIES_FILE`
 solo son fallback para usuarios técnicos.
 
+El conector remoto no puede abrir un navegador ni leer el almacén seguro desde
+Cloudflare Workers. `iniciar-sesion-remota` ejecuta un puente local que abre
+Playwright, reclama un desafío de un solo uso en `OAUTH_KV` y envía la sesión
+por HTTPS. Los desafíos expiran en cinco minutos, no se reutilizan y nunca se
+registran cookies.
+
 ## Desarrollo local
 
 Requisitos:
@@ -243,12 +252,18 @@ Estado de la implementación al 2026-09-09:
   `https://computrabajo-mcp.torres-sergio2205.workers.dev/mcp`.
 - El despliegue verificó el binding `OAUTH_KV` con el namespace
   `5d366eb21b424183b6710392bc2164bb`.
+- El OAuth remoto ahora ofrece autenticación automática mediante el puente
+  local `iniciar-sesion-remota`. La persona usuaria ejecuta un único comando
+  por autenticación; el puente abre Computrabajo, transfiere la sesión por
+  HTTPS con un desafío efímero y se cierra después.
+- El cambio del puente local está validado localmente, pero todavía requiere
+  un nuevo despliegue del Worker antes de probarlo contra la URL pública.
 
 Orden obligatorio para continuar:
 
-1. Fusionar `feat/application-questions` en `master` para activar el
-   despliegue de producción mediante GitHub Actions.
-2. Probar OAuth y MCP con un cliente nuevo antes de retirar la URL anterior.
+1. Publicar los cambios en `main` para activar el despliegue de producción
+   mediante GitHub Actions.
+2. Desplegar el cambio del puente OAuth y probarlo con un cliente nuevo.
 3. Revisar logs sin exponer cookies, tokens, campos ocultos ni respuestas
    personales.
 

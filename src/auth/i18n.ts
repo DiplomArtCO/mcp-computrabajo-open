@@ -46,6 +46,7 @@ type Copy = {
   help1: string;
   help2: string;
   authorize: string;
+  browserLogin: string;
   skip: string;
   footer: string;
   errors: Record<CookieError, string>;
@@ -68,6 +69,7 @@ export const COPY: Record<Lang, Copy> = {
     help2:
       "Es una línea larga con varios pares <kbd>nombre=valor</kbd>. Un solo valor copiado del panel Application no sirve.",
     authorize: "Autorizar",
+    browserLogin: "Iniciar sesión automáticamente",
     skip: "Solo buscar",
     footer:
       "Se guarda cifrada para esta conexión, se usa solo para lo que pidas y se borra al desconectar. Quien tenga tu cookie puede actuar como tú: pega únicamente la tuya.",
@@ -97,6 +99,7 @@ export const COPY: Record<Lang, Copy> = {
     help2:
       "It is one long line with several <kbd>name=value</kbd> pairs. A single value copied from the Application panel will not work.",
     authorize: "Authorize",
+    browserLogin: "Sign in automatically",
     skip: "Search only",
     footer:
       "Stored encrypted for this connection, used only for actions you ask for, and erased when you disconnect. Anyone with your cookie can act as you — only paste your own.",
