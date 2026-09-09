@@ -34,20 +34,18 @@ capacidades mediante chat y las herramientas MCP.
 
 El servidor remoto se despliega desde este repositorio en Cloudflare Workers.
 La URL de producción usa el subdominio gratuito de Cloudflare:
-`https://computrabajo-mcp.<tu-subdominio>.workers.dev/mcp`. Sustituye
-`<tu-subdominio>` por el identificador de tu cuenta cuando el Worker quede
-desplegado.
+`https://computrabajo-mcp.torres-sergio2205.workers.dev/mcp`.
 
 **Claude Desktop y claude.ai** — Configuración → Conectores → Agregar conector personalizado:
 
 ```
-https://computrabajo-mcp.<tu-subdominio>.workers.dev/mcp
+https://computrabajo-mcp.torres-sergio2205.workers.dev/mcp
 ```
 
 **Claude Code**
 
 ```bash
-claude mcp add --transport http computrabajo https://computrabajo-mcp.<tu-subdominio>.workers.dev/mcp
+claude mcp add --transport http computrabajo https://computrabajo-mcp.torres-sergio2205.workers.dev/mcp
 ```
 
 Al conectar se abre una página que pide tu cookie de sesión de Computrabajo.

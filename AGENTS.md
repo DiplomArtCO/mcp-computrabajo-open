@@ -218,7 +218,7 @@ La producción debe desplegarse desde el repositorio personal:
 El Worker previsto se llama `computrabajo-mcp` y debe exponerse mediante el
 subdominio gratuito de Cloudflare:
 
-`https://computrabajo-mcp.<subdominio>.workers.dev/mcp`
+`https://computrabajo-mcp.torres-sergio2205.workers.dev/mcp`
 
 La configuración declarativa está en `wrangler.jsonc` y el pipeline está en
 `.github/workflows/deploy-worker.yml`. El pipeline despliega únicamente desde
@@ -237,20 +237,19 @@ Estado de la implementación al 2026-09-09:
   `feat/application-questions`.
 - El namespace KV `computrabajo-mcp-oauth` fue creado.
 - Tests, typecheck y build pasan localmente.
-- El Worker todavía requiere un despliegue autenticado en la cuenta Cloudflare.
-- La URL en README/ONBOARDING contiene `<subdominio>` como placeholder hasta
-  obtener la URL real de Wrangler.
+- El Worker `computrabajo-mcp` fue desplegado correctamente en Cloudflare
+  Workers.
+- La URL pública es
+  `https://computrabajo-mcp.torres-sergio2205.workers.dev/mcp`.
+- El despliegue verificó el binding `OAUTH_KV` con el namespace
+  `5d366eb21b424183b6710392bc2164bb`.
 
 Orden obligatorio para continuar:
 
-1. Configurar `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID` localmente o como
-   secretos de GitHub.
-2. Fusionar `feat/application-questions` en `master` o desplegar solo para
-   validación con Wrangler.
-3. Ejecutar `wrangler deploy` y registrar la URL `workers.dev` resultante.
-4. Sustituir el placeholder de la URL en la documentación.
-5. Probar OAuth y MCP con un cliente nuevo antes de retirar la URL anterior.
-6. Revisar logs sin exponer cookies, tokens, campos ocultos ni respuestas
+1. Fusionar `feat/application-questions` en `master` para activar el
+   despliegue de producción mediante GitHub Actions.
+2. Probar OAuth y MCP con un cliente nuevo antes de retirar la URL anterior.
+3. Revisar logs sin exponer cookies, tokens, campos ocultos ni respuestas
    personales.
 
 No usar una redirección HTTP simple como sustituto de la migración OAuth.
