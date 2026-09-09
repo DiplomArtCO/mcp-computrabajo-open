@@ -21,11 +21,12 @@ preguntas de selección y postulaciones se necesita una sesión local.
 La única operación excepcional que puede requerir terminal es el primer
 inicio de sesión, porque Computrabajo no ofrece OAuth público para candidatos:
 
-1. Instala Node.js y ejecuta `npx playwright install chromium`.
+1. Instala Node.js.
 2. Ejecuta `npx mcp-computrabajo@latest iniciar-sesion`.
-3. Completa el acceso manualmente en la ventana visible de Computrabajo.
-4. Cierra la ventana cuando el mensaje indique que la sesión fue guardada.
-5. Conecta el MCP local en tu cliente:
+3. Si Chromium no está instalado, confirma su descarga cuando el programa lo solicite.
+4. Completa el acceso manualmente en la ventana visible de Computrabajo.
+5. Cierra la ventana cuando el mensaje indique que la sesión fue guardada.
+6. Conecta el MCP local en tu cliente:
    `npx mcp-computrabajo@latest`.
 
 La contraseña, CAPTCHA y MFA los gestiona la persona directamente en el

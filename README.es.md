@@ -114,8 +114,8 @@ claude mcp add computrabajo --env CT_COOKIES="<tu cookie>" -- npx mcp-computraba
 Para iniciar sesión de forma asistida en una ventana visible del navegador:
 
 ```bash
-npx playwright install chromium
-npx mcp-computrabajo@latest login
+npx mcp-computrabajo@latest iniciar-sesion
+npx mcp-computrabajo@latest
 ```
 
 Completa el inicio de sesión directamente en Computrabajo. El agente no recibe
