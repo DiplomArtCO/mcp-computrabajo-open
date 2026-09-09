@@ -17,3 +17,10 @@ export const offerIdSchema = z
   .describe(
     "The 32-character hexadecimal offer ID (e.g. '7688C0282117AF8561373E686DCF3405'). Obtained from search-jobs results.",
   );
+
+export const pageSchema = z
+  .number()
+  .int("page must be an integer")
+  .min(1, "page must be at least 1")
+  .optional()
+  .describe("Page number for pagination; starts at 1.");

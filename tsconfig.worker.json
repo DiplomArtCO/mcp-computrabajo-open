@@ -8,6 +8,7 @@
   "exclude": [
     "./src/index.ts",
     "./src/config/node-config.ts",
-    "./src/infrastructure/mcp/stdio.ts"
+    "./src/infrastructure/mcp/stdio.ts",
+    "./src/local-auth/**/*.ts"
   ]
 }

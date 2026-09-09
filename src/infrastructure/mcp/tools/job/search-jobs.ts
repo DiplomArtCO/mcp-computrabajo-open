@@ -3,30 +3,29 @@ import { jobListingSchema } from "../../../../domain/models/computrabajo.model";
 import { READ_ONLY } from "../annotations";
 import { errorResponse } from "../error";
 import type { ToolRegistrar } from "../registrar";
-import { countrySchema } from "../schemas";
+import { countrySchema, pageSchema } from "../schemas";
 
 const DESCRIPTION =
   "Search for job listings on Computrabajo by keyword and optional location. Returns a list of job offers with title, company, location, salary, and publication date. Computrabajo matches the keyword against the job title fairly literally, so the wording of the keyword decides the quality of the results — see the keyword parameter. Default country is Colombia (co).";
 
-const inputSchema = z.object({
+export const searchJobsInputSchema = z.object({
   keyword: z
     .string()
+    .trim()
+    .min(1, "keyword must not be empty")
     .describe(
       "Job search keyword as a lowercase, hyphenated slug (e.g. 'desarrollador-de-software', 'analista-programador', 'marketing'). For software and IT roles prefer 'desarrollador-...', 'programador', 'analista-programador', or a bare technology or role noun such as 'software', 'java', 'devops'. Avoid 'ingeniero-de-...' for software work: in Latin America that phrasing matches civil, mechanical, electrical and mining postings, so 'ingeniero-de-software' returns mostly irrelevant results. If a search comes back off-topic, retry with a 'desarrollador-' or bare-noun form before telling the user there is nothing.",
     ),
   location: z
     .string()
+    .trim()
+    .min(1, "location must not be empty")
     .optional()
     .describe(
       "Location slug for filtering results (e.g. 'lima', 'la-libertad-en-trujillo', 'arequipa'). If omitted, searches nationwide.",
     ),
   country: countrySchema,
-  page: z
-    .number()
-    .optional()
-    .describe(
-      "Page number for pagination (starts at 1). Each page returns up to 20 results.",
-    ),
+  page: pageSchema,
 });
 
 const outputSchema = z.object({
@@ -39,7 +38,7 @@ export const register: ToolRegistrar = (server, repository) => {
     {
       title: "Search Jobs",
       description: DESCRIPTION,
-      inputSchema,
+      inputSchema: searchJobsInputSchema,
       outputSchema,
       annotations: READ_ONLY,
     },

@@ -5,6 +5,8 @@ import type { SessionStore } from "./session-provider";
 const DEFAULT_PORT = 8765;
 const DEFAULT_REMOTE_SERVER =
   "https://computrabajo-mcp.torres-sergio2205.workers.dev";
+const CHALLENGE_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 class MemorySessionStore implements SessionStore {
   private cookies?: string;
@@ -44,6 +46,7 @@ export async function startRemoteLogin(
     if (
       !remoteServer ||
       !challenge ||
+      !CHALLENGE_PATTERN.test(challenge) ||
       !/^https:\/\//i.test(remoteServer) ||
       new URL(remoteServer).origin !== allowedServer
     ) {
@@ -70,8 +73,12 @@ export async function startRemoteLogin(
         "<p>Sesión detectada. Puedes cerrar esta pestaña y volver al cliente MCP.</p>",
       );
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Error desconocido";
-      response(res, 500, `<p>${message.replace(/[<>&"]/g, "")}</p>`);
+      void error;
+      response(
+        res,
+        500,
+        "<p>No se pudo completar el inicio de sesión remoto. Vuelve al cliente MCP e inténtalo de nuevo.</p>",
+      );
     } finally {
       server.close();
     }

@@ -288,53 +288,63 @@ export class ComputrabajoHttpRepository implements ComputrabajoRepository {
     body.append("d", "33");
     body.append("lc", "ListOffers");
 
-    if (params.answers) {
-      const form = await this.getApplicationForm({
-        offerId: params.offerId,
-        country,
-      });
-      targetUrl = form.submitUrl || applyUrl;
-      const questions = new Map(
-        form.questions.map((question) => [question.questionId, question]),
-      );
-      const supplied = new Set<string>();
-      for (const answer of params.answers) {
-        const question = questions.get(answer.questionId);
-        if (!question)
-          throw new Error(`Unknown application question: ${answer.questionId}`);
-        if (supplied.has(answer.questionId)) {
-          throw new Error(`Duplicate application answer: ${answer.questionId}`);
-        }
-        supplied.add(answer.questionId);
-        const values = Array.isArray(answer.answer)
-          ? answer.answer
-          : [answer.answer];
-        if (question.required && values.every((value) => value.trim() === "")) {
-          throw new Error(
-            `Required application question is empty: ${answer.questionId}`,
-          );
-        }
-        if (question.options.length > 0) {
-          const allowed = new Set(
-            question.options.map((option) => option.value),
-          );
-          if (values.some((value) => !allowed.has(value))) {
-            throw new Error(
-              `Invalid option for application question: ${answer.questionId}`,
-            );
-          }
-        }
-        for (const value of values) body.append(question.name, value);
-      }
-      for (const question of form.questions) {
-        if (question.required && !supplied.has(question.questionId)) {
-          throw new Error(
-            `Missing required application question: ${question.questionId}`,
-          );
-        }
-      }
-      for (const field of form.fields) body.append(field.name, field.value);
+    const form = await this.getApplicationForm({
+      offerId: params.offerId,
+      country,
+    });
+    if (form.status === "already_applied") {
+      return {
+        success: false,
+        message: "The user has already applied to this offer.",
+      };
     }
+    if (form.status === "closed") {
+      return {
+        success: false,
+        message: "The offer is no longer accepting applications.",
+      };
+    }
+    targetUrl = form.submitUrl || applyUrl;
+    const questions = new Map(
+      form.questions.map((question) => [question.questionId, question]),
+    );
+    const supplied = new Set<string>();
+    for (const answer of params.answers || []) {
+      const question = questions.get(answer.questionId);
+      if (!question)
+        throw new Error(`Unknown application question: ${answer.questionId}`);
+      if (supplied.has(answer.questionId)) {
+        throw new Error(`Duplicate application answer: ${answer.questionId}`);
+      }
+      supplied.add(answer.questionId);
+      const values = Array.isArray(answer.answer)
+        ? answer.answer
+        : [answer.answer];
+      if (question.required && values.every((value) => value.trim() === "")) {
+        throw new Error(
+          `Required application question is empty: ${answer.questionId}`,
+        );
+      }
+      if (question.options.length > 0) {
+        const allowed = new Set(
+          question.options.map((option) => option.value),
+        );
+        if (values.some((value) => !allowed.has(value))) {
+          throw new Error(
+            `Invalid option for application question: ${answer.questionId}`,
+          );
+        }
+      }
+      for (const value of values) body.append(question.name, value);
+    }
+    for (const question of form.questions) {
+      if (question.required && !supplied.has(question.questionId)) {
+        throw new Error(
+          `Missing required application question: ${question.questionId}`,
+        );
+      }
+    }
+    for (const field of form.fields) body.append(field.name, field.value);
 
     const res = await fetch(targetUrl, {
       method: "POST",

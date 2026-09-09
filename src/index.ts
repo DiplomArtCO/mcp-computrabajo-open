@@ -5,13 +5,13 @@ import { ComputrabajoHttpRepository } from "./infrastructure/http/computrabajo-h
 import { startServer } from "./infrastructure/mcp/stdio";
 import { loginWithBrowser } from "./local-auth/browser-login";
 import { startRemoteLogin } from "./local-auth/remote-login";
-import { KeytarSessionStore } from "./local-auth/secure-store";
 
 async function main(): Promise<void> {
   const command = process.argv[2];
-  const store = new KeytarSessionStore();
 
   if (command === "iniciar-sesion" || command === "login") {
+    const { KeytarSessionStore } = await import("./local-auth/secure-store");
+    const store = new KeytarSessionStore();
     await loginWithBrowser(store);
     return;
   }
@@ -22,12 +22,20 @@ async function main(): Promise<void> {
   }
 
   if (command === "cerrar-sesion" || command === "logout") {
+    const { KeytarSessionStore } = await import("./local-auth/secure-store");
+    const store = new KeytarSessionStore();
     await store.clear();
     console.error("Sesión local eliminada.");
     return;
   }
 
   if (command === "estado" || command === "status") {
+    if (process.env.CT_DISABLE_LOCAL_SESSION === "1") {
+      console.error("No hay sesión local.");
+      return;
+    }
+    const { KeytarSessionStore } = await import("./local-auth/secure-store");
+    const store = new KeytarSessionStore();
     console.error(
       (await store.read()) ? "Sesión local disponible." : "No hay sesión local.",
     );

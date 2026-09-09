@@ -26,6 +26,11 @@ jobs:
       - run: bun run typecheck
       - run: bun test
       - run: bun run build
+      - name: Verify npm tarball contents
+        shell: bash
+        run: |
+          package_path="$(npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP" | tail -n 1)"
+          tar -tf "$RUNNER_TEMP/$package_path" | grep -E '(^|/)dist/src/index\.js$|(^|/)scripts/install-skills\.mjs$|(^|/)skills/.*\.md$'
 
   deploy:
     if: github.event_name == 'push'

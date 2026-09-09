@@ -146,9 +146,13 @@ describe("applyToJob", () => {
     }).applyToJob({ offerId: "A".repeat(32) });
 
   test("reports success only on the offerappliedok result code", async () => {
-    stubFetch(
-      new Response(JSON.stringify({ type: 5, result: "OfferAppliedOk" })),
-    );
+    let requestCount = 0;
+    globalThis.fetch = (async () => {
+      requestCount++;
+      return requestCount === 1
+        ? new Response("<form></form>")
+        : new Response(JSON.stringify({ type: 5, result: "OfferAppliedOk" }));
+    }) as unknown as typeof fetch;
 
     expect(await apply()).toEqual({
       success: true,

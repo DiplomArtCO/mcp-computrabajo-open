@@ -25,7 +25,10 @@ export function json(body: unknown, status = 200): Response {
   return withCors(
     new Response(JSON.stringify(body), {
       status,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store",
+      },
     }),
   );
 }

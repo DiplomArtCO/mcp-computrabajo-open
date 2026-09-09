@@ -171,6 +171,7 @@ usa `iniciar-sesion-remota`. `CT_COOKIES` y
 | `CT_COOKIES` | — | Cadena de cookies de tu sesión del navegador |
 | `CT_COOKIES_FILE` | `~/.computrabajo/cookies.txt` | Archivo con la cookie, como alternativa |
 | `CT_COUNTRY` | `co` | Código de país por defecto |
+| `CT_DISABLE_LOCAL_SESSION` | `0` | Usa `1` en pruebas aisladas para no leer la sesión guardada en el almacén seguro |
 
 ## Desarrollo
 

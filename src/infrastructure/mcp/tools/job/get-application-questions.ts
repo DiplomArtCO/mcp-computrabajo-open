@@ -1,9 +1,22 @@
 import { z } from "zod";
-import { applicationFormSchema } from "../../../../domain/models/computrabajo.model";
+import {
+  applicationFormSchema,
+  type ApplicationForm,
+} from "../../../../domain/models/computrabajo.model";
 import { READ_ONLY } from "../annotations";
 import { errorResponse } from "../error";
 import type { ToolRegistrar } from "../registrar";
 import { countrySchema, offerIdSchema } from "../schemas";
+
+export function redactApplicationForm(form: ApplicationForm): ApplicationForm {
+  return {
+    ...form,
+    fields: form.fields.map(({ name }) => ({
+      name,
+      value: "[redacted]",
+    })),
+  };
+}
 
 const inputSchema = z.object({
   offerId: offerIdSchema,
@@ -16,7 +29,7 @@ export const register: ToolRegistrar = (server, repository) => {
     {
       title: "Get Application Questions",
       description:
-        "Read the current application form for a Computrabajo offer without submitting an application. Returns questions, valid options, and dynamic hidden fields.",
+        "Read the current application form for a Computrabajo offer without submitting an application. Returns questions, valid options, and dynamic hidden field names with their values redacted.",
       inputSchema,
       outputSchema: applicationFormSchema,
       annotations: READ_ONLY,
@@ -27,9 +40,10 @@ export const register: ToolRegistrar = (server, repository) => {
           offerId,
           country,
         });
+        const safeOutput = redactApplicationForm(output);
         return {
-          content: [{ type: "text", text: JSON.stringify(output) }],
-          structuredContent: output,
+          content: [{ type: "text", text: JSON.stringify(safeOutput) }],
+          structuredContent: safeOutput,
         };
       } catch (error) {
         return errorResponse(error);

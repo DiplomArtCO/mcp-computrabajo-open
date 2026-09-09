@@ -3,6 +3,8 @@ import { checkCookieInput } from "./cookie-input";
 
 export const SESSION_KEY_PREFIX = "remote-session:";
 export const SESSION_TTL_SECONDS = 300;
+const CHALLENGE_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export type PendingSession = {
   authUrl: string;
@@ -29,7 +31,9 @@ export async function claimSession(
   const challenge = typeof body?.challenge === "string" ? body.challenge : "";
   const cookies = typeof body?.cookies === "string" ? body.cookies : "";
   const checked = checkCookieInput(cookies);
-  if (!challenge || !checked.ok) return json({ error: "Invalid session" }, 400);
+  if (!CHALLENGE_PATTERN.test(challenge) || !checked.ok) {
+    return json({ error: "Invalid session" }, 400);
+  }
 
   const key = `${SESSION_KEY_PREFIX}${challenge}`;
   const pending = await kv.get<PendingSession>(key, "json");
@@ -49,6 +53,9 @@ export async function sessionStatus(
 ): Promise<Response> {
   if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
   const challenge = new URL(request.url).searchParams.get("challenge") || "";
+  if (!CHALLENGE_PATTERN.test(challenge)) {
+    return json({ status: "expired" }, 410);
+  }
   const pending = challenge
     ? await kv.get<PendingSession>(`${SESSION_KEY_PREFIX}${challenge}`, "json")
     : null;
