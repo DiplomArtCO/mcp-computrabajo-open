@@ -1,8 +1,8 @@
-# MCP Computrabajo
+# Computrabajo Open MCP
 
 Servidor MCP para Computrabajo, la bolsa de empleo más grande de Latinoamérica: busca ofertas, lee la publicación completa, consulta tu propio CV y postula.
 
-[![NPM Version](https://img.shields.io/npm/v/mcp-computrabajo?style=flat&logo=npm&logoColor=red)](https://www.npmjs.com/package/mcp-computrabajo)
+[![NPM Version](https://img.shields.io/npm/v/mcp-computrabajo-open?style=flat&logo=npm&logoColor=red)](https://www.npmjs.com/package/mcp-computrabajo-open)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Documentación en español**
@@ -32,27 +32,27 @@ capacidades mediante chat y las herramientas MCP.
 
 ## Conectar
 
-El servidor remoto se despliega desde este repositorio en Cloudflare Workers.
-La URL de producción usa el subdominio gratuito de Cloudflare:
-`https://computrabajo-mcp.torres-sergio2205.workers.dev/mcp`.
+El servidor remoto se despliega desde una cuenta de Cloudflare controlada por
+el mantenedor. La URL definitiva se configura mediante `CT_REMOTE_SERVER` y
+debe apuntar al Worker propio, nunca al Worker de un tercero.
 
 **Claude Desktop y claude.ai** — Configuración → Conectores → Agregar conector personalizado:
 
 ```
-https://computrabajo-mcp.torres-sergio2205.workers.dev/mcp
+https://TU_WORKER_PROPIO/mcp
 ```
 
 **Claude Code**
 
 ```bash
-claude mcp add --transport http computrabajo https://computrabajo-mcp.torres-sergio2205.workers.dev/mcp
+claude mcp add --transport http computrabajo-open https://TU_WORKER_PROPIO/mcp
 ```
 
 Al conectar se abre una página de autorización. Para autenticarte sin copiar
 cookies, ejecuta en otra terminal:
 
 ```bash
-npx mcp-computrabajo@latest iniciar-sesion-remota
+CT_REMOTE_SERVER=https://TU_WORKER_PROPIO npx mcp-computrabajo-open@latest iniciar-sesion-remota
 ```
 
 Después pulsa **Iniciar sesión automáticamente** en la página OAuth y
@@ -135,7 +135,7 @@ Latinoamérica esa forma trae avisos de civil, mecánica y minería.
 El paquete de npm publica el mismo servidor por stdio:
 
 ```bash
-claude mcp add computrabajo --env CT_COOKIES="<tu cookie>" -- npx mcp-computrabajo@latest
+claude mcp add computrabajo-open --env CT_COOKIES="<tu cookie>" -- npx mcp-computrabajo-open@latest
 ```
 
 ### MCP local sin copiar cookies
@@ -143,8 +143,8 @@ claude mcp add computrabajo --env CT_COOKIES="<tu cookie>" -- npx mcp-computraba
 Para iniciar sesión de forma asistida en una ventana visible del navegador:
 
 ```bash
-npx mcp-computrabajo@latest iniciar-sesion
-npx mcp-computrabajo@latest
+npx mcp-computrabajo-open@latest iniciar-sesion
+npx mcp-computrabajo-open@latest
 ```
 
 Completa el inicio de sesión directamente en Computrabajo. El agente no recibe
@@ -152,14 +152,14 @@ ni almacena tu contraseña, y guarda la sesión en el almacén seguro del sistem
 operativo. Después configura tu cliente MCP para ejecutar:
 
 ```bash
-npx mcp-computrabajo@latest
+npx mcp-computrabajo-open@latest
 ```
 
 Comandos disponibles:
 
 ```bash
-npx mcp-computrabajo@latest status
-npx mcp-computrabajo@latest logout
+npx mcp-computrabajo-open@latest status
+npx mcp-computrabajo-open@latest logout
 ```
 
 El flujo local es independiente del conector remoto. Para el conector remoto
@@ -212,4 +212,4 @@ del propio sitio.
 ## Licencia
 
 MIT — ver [LICENSE](LICENSE). Sin afiliación con Computrabajo. Dudas y
-problemas: [GitHub Issues](https://github.com/DiplomArtCO/mcp-computrabajo-preguntas/issues).
+problemas: [GitHub Issues](https://github.com/DiplomArtCO/mcp-computrabajo-open/issues).

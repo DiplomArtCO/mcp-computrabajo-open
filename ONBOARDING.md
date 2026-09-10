@@ -11,7 +11,7 @@ Para entornos CI o instalaciones que solo necesiten el servidor MCP, usa
 `CT_INSTALL_SKILLS=0`. Para eliminar las skills administradas:
 
 ```bash
-node node_modules/mcp-computrabajo/scripts/install-skills.mjs --uninstall
+node node_modules/mcp-computrabajo-open/scripts/install-skills.mjs --uninstall
 ```
 
 En clientes distintos de Claude Code, las mismas funciones se usan mediante
@@ -22,7 +22,7 @@ el chat y las herramientas MCP.
 En Claude Desktop, claude.ai u otro cliente MCP compatible, abre la sección
 de conectores y agrega:
 
-`https://computrabajo-mcp.torres-sergio2205.workers.dev/mcp`
+`https://TU_WORKER_PROPIO/mcp`
 
 Después escribe en el chat, por ejemplo:
 
@@ -34,7 +34,7 @@ Para autenticar el conector remoto sin copiar cookies, ejecuta en una
 terminal:
 
 ```bash
-npx mcp-computrabajo@latest iniciar-sesion-remota
+CT_REMOTE_SERVER=https://TU_WORKER_PROPIO npx mcp-computrabajo-open@latest iniciar-sesion-remota
 ```
 
 Luego pulsa **Iniciar sesión automáticamente** en la autorización OAuth y
@@ -51,12 +51,12 @@ La única operación excepcional que puede requerir terminal es el primer
 inicio de sesión, porque Computrabajo no ofrece OAuth público para candidatos:
 
 1. Instala Node.js.
-2. Ejecuta `npx mcp-computrabajo@latest iniciar-sesion`.
+2. Ejecuta `npx mcp-computrabajo-open@latest iniciar-sesion`.
 3. Si Chromium no está instalado, confirma su descarga cuando el programa lo solicite.
 4. Completa el acceso manualmente en la ventana visible de Computrabajo.
 5. Cierra la ventana cuando el mensaje indique que la sesión fue guardada.
 6. Conecta el MCP local en tu cliente:
-   `npx mcp-computrabajo@latest`.
+   `npx mcp-computrabajo-open@latest`.
 
 La contraseña, CAPTCHA y MFA los gestiona la persona directamente en el
 navegador. La sesión se guarda en el almacén seguro del sistema operativo.

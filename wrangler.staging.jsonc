@@ -1,13 +1,13 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "computrabajo-open-mcp",
+  "name": "computrabajo-open-mcp-staging",
   "main": "src/worker.ts",
   "compatibility_date": "2026-08-01",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "kv_namespaces": [
     {
       "binding": "OAUTH_KV",
-      "id": "3933b700f0a4442b9fe31dc2a12af50c",
+      "id": "2f4fcbd8df0249728bf1c6cec0050687",
       "remote": true
     }
   ],

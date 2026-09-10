@@ -1,5 +1,5 @@
 {
-  "name": "mcp-computrabajo",
+  "name": "mcp-computrabajo-open",
   "description": "A Model Context Protocol (MCP) server for accessing Computrabajo job listings in Latin America",
   "version": "1.0.1",
   "module": "dist/src/index.js",
@@ -14,7 +14,7 @@
   },
   "type": "module",
   "bin": {
-    "mcp-computrabajo": "dist/src/index.js"
+    "mcp-computrabajo-open": "dist/src/index.js"
   },
   "private": false,
   "keywords": [
@@ -34,7 +34,7 @@
     "scraping",
     "claude"
   ],
-  "author": "DiplomArtCO",
+  "author": "Sergio Torres",
   "license": "MIT",
   "files": [
     "dist/src/*.js",
@@ -55,6 +55,7 @@
     "cf-typegen": "wrangler types",
     "dev:worker": "wrangler dev",
     "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --config wrangler.staging.jsonc",
     "inspect:worker": "bunx @modelcontextprotocol/inspector",
     "test": "bun test"
   },

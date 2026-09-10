@@ -1,0 +1,57 @@
+# Despliegue de Computrabajo Open MCP
+
+Esta distribución es mantenida y publicada por Sergio Torres. El proyecto
+conserva la licencia MIT original y no es afiliado con Computrabajo.
+
+Repositorio: https://github.com/DiplomArtCO/mcp-computrabajo-open
+
+## Recursos que debe crear el propietario
+
+Antes de desplegar, crea en una cuenta propia:
+
+1. Un repositorio GitHub para este código.
+2. Una cuenta npm con 2FA y el paquete `mcp-computrabajo-open`.
+3. Un Worker de producción y otro de staging.
+4. Un namespace KV OAuth distinto para cada Worker.
+5. Un subdominio controlado por el propietario.
+
+No reutilices el namespace KV ni el endpoint del proyecto anterior.
+
+## Configuración local
+
+Reemplaza el marcador del archivo `wrangler.jsonc` por el ID del namespace KV
+de producción. Para staging, usa una copia de la configuración con otro nombre
+de Worker y otro ID KV:
+
+```powershell
+bun install --frozen-lockfile
+bun test
+bun run typecheck
+bun run build
+bunx wrangler deploy --dry-run
+```
+
+El puente de sesión remota debe recibir la URL del Worker propio mediante
+`CT_REMOTE_SERVER`. Nunca registres cookies, tokens, headers privados ni
+campos ocultos.
+
+## Secretos de GitHub Actions
+
+Configura estos secretos en el repositorio propio, sin escribirlos en archivos:
+
+- `NPM_TOKEN`: granular access token con publicación únicamente para este paquete.
+- `CLOUDFLARE_API_TOKEN`: token limitado al despliegue del Worker.
+- `CLOUDFLARE_ACCOUNT_ID`: cuenta Cloudflare propietaria.
+
+El workflow de npm se activa con tags `v*.*.*`. El workflow de Cloudflare se
+activa con pushes a `main`.
+
+## Publicación
+
+```powershell
+npm view mcp-computrabajo-open version
+npm publish --access public
+```
+
+La publicación requiere pertenecer al paquete o a su organización npm. Una
+cuenta sin ese control no puede publicar actualizaciones.

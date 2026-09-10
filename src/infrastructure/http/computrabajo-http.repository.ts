@@ -53,7 +53,7 @@ const INVALID_SESSION =
   "Computrabajo did not return the signed-in page — the session cookie is expired or invalid. Reconnect the connector and paste a fresh cookie.";
 
 const MISSING_COOKIES =
-  "No Computrabajo session cookie available. Run `mcp-computrabajo login` locally, or configure CT_COOKIES/CT_COOKIES_FILE.";
+  "No Computrabajo session cookie available. Run `mcp-computrabajo-open login` locally, or configure CT_COOKIES/CT_COOKIES_FILE.";
 
 function controlType(
   tag: string,

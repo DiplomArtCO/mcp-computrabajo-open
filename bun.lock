@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "mcp-computrabajo",
+      "name": "mcp-computrabajo-open",
       "dependencies": {
         "@cloudflare/workers-oauth-provider": "0.10.3",
         "@modelcontextprotocol/server": "2.0.0",

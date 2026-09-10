@@ -4,7 +4,7 @@ import type { SessionStore } from "./session-provider";
 
 const DEFAULT_PORT = 8765;
 const DEFAULT_REMOTE_SERVER =
-  "https://computrabajo-mcp.torres-sergio2205.workers.dev";
+  "https://computrabajo-open-mcp.workers.dev";
 const CHALLENGE_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 

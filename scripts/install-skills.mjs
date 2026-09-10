@@ -7,12 +7,12 @@ const packageRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 const sourceRoot = join(packageRoot, "skills");
 const configRoot = process.env.CLAUDE_CONFIG_DIR || join(homedir(), ".claude");
 const targetRoot = join(configRoot, "skills");
-const manifestPath = join(targetRoot, ".mcp-computrabajo.json");
-const marker = "<!-- Managed by mcp-computrabajo. Do not edit this line. -->";
+const manifestPath = join(targetRoot, ".mcp-computrabajo-open.json");
+const marker = "<!-- Managed by mcp-computrabajo-open. Do not edit this line. -->";
 
 if (process.env.CT_INSTALL_SKILLS === "0") {
   console.warn(
-    "mcp-computrabajo: skill installation skipped (CT_INSTALL_SKILLS=0).",
+    "mcp-computrabajo-open: skill installation skipped (CT_INSTALL_SKILLS=0).",
   );
   process.exit(0);
 }
@@ -44,7 +44,7 @@ async function install() {
     } catch {}
 
     if (existing && !existing.includes(marker)) {
-      console.warn(`mcp-computrabajo: preserving existing ${target}`);
+      console.warn(`mcp-computrabajo-open: preserving existing ${target}`);
       continue;
     }
 
@@ -56,10 +56,10 @@ async function install() {
 
   await writeFile(
     manifestPath,
-    JSON.stringify({ package: "mcp-computrabajo", files: installed }, null, 2),
+    JSON.stringify({ package: "mcp-computrabajo-open", files: installed }, null, 2),
     "utf8",
   );
-  console.log(`mcp-computrabajo: installed ${installed.length} Claude skills.`);
+  console.log(`mcp-computrabajo-open: installed ${installed.length} Claude skills.`);
 }
 
 async function uninstall() {
@@ -73,7 +73,7 @@ async function uninstall() {
     } catch {}
   }
   await rm(manifestPath, { force: true });
-  console.log("mcp-computrabajo: managed Claude skills removed.");
+  console.log("mcp-computrabajo-open: managed Claude skills removed.");
 }
 
 if (process.argv.includes("--uninstall")) {

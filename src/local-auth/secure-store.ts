@@ -1,6 +1,6 @@
 import type { SessionStore } from "./session-provider";
 
-export const KEYCHAIN_SERVICE = "mcp-computrabajo";
+export const KEYCHAIN_SERVICE = "mcp-computrabajo-open";
 export const KEYCHAIN_ACCOUNT = "computrabajo-session";
 
 export class KeytarSessionStore implements SessionStore {
