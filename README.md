@@ -184,7 +184,7 @@ bun run dev:worker     # Worker en http://localhost:8787/mcp
 bun run deploy         # requiere `wrangler login`
 ```
 
-Los pushes a `master` ejecutan las validaciones y despliegan el Worker mediante
+Los pushes a `main` ejecutan las validaciones y despliegan el Worker mediante
 `.github/workflows/deploy-worker.yml`. El repositorio necesita los secretos
 `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID` configurados en GitHub.
 

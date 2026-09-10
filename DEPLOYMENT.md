@@ -1,7 +1,10 @@
 # Despliegue de Computrabajo Open MCP
 
 Esta distribución es mantenida y publicada por Sergio Torres. El proyecto
-conserva la licencia MIT original y no es afiliado con Computrabajo.
+conserva la licencia MIT original y no es afiliado con Computrabajo. Se publica
+como un paquete npm independiente (`mcp-computrabajo-open`), basado en la
+versión mejorada del MCP original; no requiere acceso a la cuenta propietaria
+del paquete original.
 
 Repositorio: https://github.com/DiplomArtCO/mcp-computrabajo-open
 
@@ -10,7 +13,8 @@ Repositorio: https://github.com/DiplomArtCO/mcp-computrabajo-open
 Antes de desplegar, crea en una cuenta propia:
 
 1. Un repositorio GitHub para este código.
-2. Una cuenta npm con 2FA y el paquete `mcp-computrabajo-open`.
+2. Una cuenta npm propia con 2FA para publicar el paquete independiente
+   `mcp-computrabajo-open`.
 3. Un Worker de producción y otro de staging.
 4. Un namespace KV OAuth distinto para cada Worker.
 5. Un subdominio controlado por el propietario.
@@ -53,5 +57,6 @@ npm view mcp-computrabajo-open version
 npm publish --access public
 ```
 
-La publicación requiere pertenecer al paquete o a su organización npm. Una
-cuenta sin ese control no puede publicar actualizaciones.
+La publicación requiere pertenecer únicamente al paquete independiente
+`mcp-computrabajo-open`. No es necesario pertenecer ni tener acceso al paquete
+npm original.
