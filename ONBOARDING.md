@@ -22,7 +22,7 @@ el chat y las herramientas MCP.
 En Claude Desktop, claude.ai u otro cliente MCP compatible, abre la sección
 de conectores y agrega:
 
-`https://TU_WORKER_PROPIO/mcp`
+`https://computrabajo-mcp.torres-sergio2205.workers.dev/mcp`
 
 Después escribe en el chat, por ejemplo:
 
@@ -35,6 +35,13 @@ terminal:
 
 ```bash
 CT_REMOTE_SERVER=https://TU_WORKER_PROPIO npx mcp-computrabajo-open@latest iniciar-sesion-remota
+```
+
+En Windows PowerShell:
+
+```powershell
+$env:CT_REMOTE_SERVER="https://computrabajo-mcp.torres-sergio2205.workers.dev"
+npx mcp-computrabajo-open@latest iniciar-sesion-remota
 ```
 
 Luego pulsa **Iniciar sesión automáticamente** en la autorización OAuth y

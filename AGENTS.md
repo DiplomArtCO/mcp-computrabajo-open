@@ -6,15 +6,11 @@ Este repositorio contiene un servidor MCP para Computrabajo. Permite buscar
 ofertas, consultar sus detalles, leer el perfil profesional autenticado,
 listar CV adjuntos y gestionar postulaciones con preguntas de selección.
 
-Repositorio publicado:
+Repositorio publicado y remoto autorizado:
 
-`https://github.com/DiplomArtCO/mcp-computrabajo-preguntas`
+`https://github.com/DiplomArtCO/mcp-computrabajo-open`
 
-Repositorio remoto autorizado para commits y pushes:
-
-`https://github.com/DiplomArtCO/mcp-computrabajo-preguntas`
-
-Usar siempre el remoto `github-copy` para publicar cambios de este proyecto.
+Usar el remoto configurado para este repositorio para publicar cambios.
 Los commits de producción deben publicarse en la rama `main`.
 
 ## Herramientas MCP
@@ -219,9 +215,9 @@ npm exec --yes bun -- run build
 
 ## Despliegue remoto desde GitHub
 
-La producción debe desplegarse desde el repositorio personal:
+La producción se despliega desde:
 
-`https://github.com/DiplomArtCO/mcp-computrabajo-preguntas`
+`https://github.com/DiplomArtCO/mcp-computrabajo-open`
 
 El Worker previsto se llama `computrabajo-mcp` y debe exponerse mediante el
 subdominio gratuito de Cloudflare:
@@ -243,48 +239,44 @@ Estado de la implementación al 2026-09-09:
 
 - El workflow, la configuración del Worker y el cambio de OAuth están
   publicados en `main`.
-- El namespace KV `computrabajo-mcp-oauth` fue creado.
+- El namespace KV `computrabajo-mcp-oauth` fue creado como recurso histórico;
+  producción usa el namespace propio indicado en el estado actualizado.
 - Tests, typecheck y build pasan localmente.
 - El Worker `computrabajo-mcp` fue desplegado correctamente en Cloudflare
   Workers.
 - La URL pública es
   `https://computrabajo-mcp.torres-sergio2205.workers.dev/mcp`.
 - El despliegue verificó el binding `OAUTH_KV` con el namespace
-  `5d366eb21b424183b6710392bc2164bb`.
+  `1e410e9ea06b473281105e3538ac00d4`.
 - El OAuth remoto ahora ofrece autenticación automática mediante el puente
   local `iniciar-sesion-remota`. La persona usuaria ejecuta un único comando
   por autenticación; el puente abre Computrabajo, transfiere la sesión por
   HTTPS con un desafío efímero y se cierra después.
-- El cambio del puente local está validado localmente, pero todavía requiere
-  un nuevo despliegue del Worker antes de probarlo contra la URL pública.
+- El puente local apunta al Worker público y está listo para la prueba
+  autenticada.
 
 Estado actualizado al 2026-09-10:
 
-- El commit `ace3e4d` fue publicado en `main` mediante `github-copy`.
-- El tag `v1.0.1` fue publicado en GitHub para activar el workflow de npm.
-- El paquete `1.0.1` fue validado localmente desde un tarball limpio: incluye
-  el bundle compilado y las 12 skills.
-- La suite local queda en 56 tests, con typecheck, build, `wrangler
-  types --check` y `wrangler deploy --dry-run` exitosos.
-- Se añadieron validaciones para keyword vacía, página menor que uno, campos
-  ocultos redactados, desafíos OAuth UUID y modo `CT_DISABLE_LOCAL_SESSION=1`.
-- La publicación efectiva en npm sigue pendiente porque el entorno local no
-  está autenticado (`ENEEDAUTH`). El workflow `.github/workflows/publish-npm.yml`
-  requiere `NPM_TOKEN`.
-- El despliegue efectivo del Worker y la aceptación remota siguen pendientes
-  de los secretos de GitHub `CLOUDFLARE_API_TOKEN` y
-  `CLOUDFLARE_ACCOUNT_ID`; `wrangler whoami` local no está autenticado.
-- No anunciar la versión pública corregida ni ejecutar una prueba autenticada
-  contra producción hasta confirmar npm `1.0.1`, el Worker actualizado y una
-  cuenta de prueba aislada.
+- El paquete npm independiente `mcp-computrabajo-open@1.0.1` está publicado
+  con el tag `latest`.
+- El Worker `computrabajo-mcp` está publicado en
+  `https://computrabajo-mcp.torres-sergio2205.workers.dev/mcp`.
+- El namespace OAuth de producción es
+  `1e410e9ea06b473281105e3538ac00d4`; no reemplazarlo por un namespace del
+  proyecto original.
+- El workflow de Cloudflare despliega desde `main` después de verify.
+- El workflow npm usa Trusted Publishing de npm mediante OIDC y el archivo
+  `.github/workflows/publish-npm.yml`; no depende de `NPM_TOKEN`.
+- La suite validada queda en 56 tests, con typecheck, build y
+  `wrangler deploy --dry-run` exitosos.
+- La prueba autenticada de extremo a extremo con una cuenta aislada sigue
+  pendiente.
 
 Orden obligatorio para continuar:
 
-1. Verificar que los workflows de `main` y `v1.0.1` terminen correctamente.
-2. Confirmar npm `1.0.1` y desplegar el cambio OAuth al Worker desde `main`.
-3. Probar handshake, OAuth, herramientas públicas y sesión con una cuenta de
-   prueba aislada.
-4. Revisar logs sin exponer cookies, tokens, campos ocultos ni respuestas
+1. Verificar handshake, OAuth y herramientas públicas.
+2. Probar sesión con una cuenta de prueba aislada.
+3. Revisar logs sin exponer cookies, tokens, campos ocultos ni respuestas
    personales.
 
 No usar una redirección HTTP simple como sustituto de la migración OAuth.

@@ -33,13 +33,14 @@ capacidades mediante chat y las herramientas MCP.
 ## Conectar
 
 El servidor remoto se despliega desde una cuenta de Cloudflare controlada por
-el mantenedor. La URL definitiva se configura mediante `CT_REMOTE_SERVER` y
-debe apuntar al Worker propio, nunca al Worker de un tercero.
+el mantenedor. El endpoint público actual es:
+
+`https://computrabajo-mcp.torres-sergio2205.workers.dev/mcp`
 
 **Claude Desktop y claude.ai** — Configuración → Conectores → Agregar conector personalizado:
 
 ```
-https://TU_WORKER_PROPIO/mcp
+https://computrabajo-mcp.torres-sergio2205.workers.dev/mcp
 ```
 
 **Claude Code**
@@ -52,7 +53,14 @@ Al conectar se abre una página de autorización. Para autenticarte sin copiar
 cookies, ejecuta en otra terminal:
 
 ```bash
-CT_REMOTE_SERVER=https://TU_WORKER_PROPIO npx mcp-computrabajo-open@latest iniciar-sesion-remota
+CT_REMOTE_SERVER=https://computrabajo-mcp.torres-sergio2205.workers.dev npx mcp-computrabajo-open@latest iniciar-sesion-remota
+```
+
+En Windows PowerShell:
+
+```powershell
+$env:CT_REMOTE_SERVER="https://computrabajo-mcp.torres-sergio2205.workers.dev"
+npx mcp-computrabajo-open@latest iniciar-sesion-remota
 ```
 
 Después pulsa **Iniciar sesión automáticamente** en la página OAuth y

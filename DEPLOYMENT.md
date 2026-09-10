@@ -60,6 +60,7 @@ npm view mcp-computrabajo-open version
 npm publish --access public
 ```
 
-La publicación requiere pertenecer únicamente al paquete independiente
-`mcp-computrabajo-open`. No es necesario pertenecer ni tener acceso al paquete
-npm original.
+La primera publicación de `1.0.1` se hizo manualmente con 2FA. Las siguientes
+versiones deben publicarse creando un tag `vX.Y.Z` en `main`, para que actúe el
+workflow de Trusted Publishing. No es necesario pertenecer ni tener acceso al
+paquete npm original.
