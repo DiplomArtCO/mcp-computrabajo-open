@@ -7,6 +7,7 @@ import { checkCookieInput } from "./cookie-input";
 import { ERROR_PAGE, type Lang, pickLang } from "./i18n";
 import {
   claimSession,
+  getClaimedSession,
   SESSION_KEY_PREFIX,
   SESSION_TTL_SECONDS,
   sessionStatus,
@@ -16,6 +17,7 @@ import {
 const MCP_PATH = "/mcp";
 const AUTHORIZE_PATH = "/authorize";
 const SESSION_CLAIM_PATH = "/session/claim";
+const SESSION_COMPLETE_PATH = "/session/complete";
 const SESSION_STATUS_PATH = "/session/status";
 
 function html(body: string, status = 200): Response {
@@ -36,7 +38,6 @@ async function handleAuthorize(request: Request, env: Env): Promise<Response> {
   const lang = pickLang(request.headers.get("accept-language"));
   const challenge = crypto.randomUUID();
   const sessionKey = `${SESSION_KEY_PREFIX}${challenge}`;
-  const statusUrl = `${new URL(request.url).origin}${SESSION_STATUS_PATH}?challenge=${encodeURIComponent(challenge)}`;
   const remoteLoginUrl = `http://127.0.0.1:8765/login?server=${encodeURIComponent(
     new URL(request.url).origin,
   )}&challenge=${encodeURIComponent(challenge)}`;
@@ -57,7 +58,6 @@ async function handleAuthorize(request: Request, env: Env): Promise<Response> {
       action,
       lang,
       remoteLoginUrl,
-      statusUrl,
       challenge,
     }));
   }
@@ -84,7 +84,6 @@ async function handleAuthorize(request: Request, env: Env): Promise<Response> {
         action,
         lang,
         remoteLoginUrl,
-        statusUrl,
         challenge,
         error: "empty",
       }), 400);
@@ -98,7 +97,6 @@ async function handleAuthorize(request: Request, env: Env): Promise<Response> {
         action,
         lang,
         remoteLoginUrl,
-        statusUrl,
         challenge,
         error: checked.error,
       }), 400);
@@ -107,6 +105,15 @@ async function handleAuthorize(request: Request, env: Env): Promise<Response> {
     cookies = checked.cookies;
   }
 
+  return finishAuthorization(oauthRequest, env, clientName, cookies);
+}
+
+async function finishAuthorization(
+  oauthRequest: Awaited<ReturnType<Env["OAUTH_PROVIDER"]["parseAuthRequest"]>>,
+  env: Env,
+  clientName: string,
+  cookies: string | undefined,
+): Promise<Response> {
   const { redirectTo } = await env.OAUTH_PROVIDER.completeAuthorization({
     request: oauthRequest,
     userId: crypto.randomUUID(),
@@ -116,6 +123,30 @@ async function handleAuthorize(request: Request, env: Env): Promise<Response> {
   });
 
   return Response.redirect(redirectTo, 302);
+}
+
+async function handleRemoteSessionComplete(
+  request: Request,
+  env: Env,
+): Promise<Response> {
+  if (request.method !== "GET") {
+    return json({ error: "Method not allowed" }, 405);
+  }
+
+  const challenge = new URL(request.url).searchParams.get("challenge") || "";
+  const pending = await getClaimedSession(challenge, env.OAUTH_KV);
+  if (!pending) {
+    return html("<p>El enlace de inicio de sesión expiró o ya fue utilizado.</p>", 410);
+  }
+
+  const oauthRequest = await env.OAUTH_PROVIDER.parseAuthRequest(
+    new Request(pending.authUrl),
+  );
+  const client = await env.OAUTH_PROVIDER.lookupClient(oauthRequest.clientId);
+  const clientName = client?.clientName || client?.clientId || "MCP client";
+
+  await env.OAUTH_KV.delete(`${SESSION_KEY_PREFIX}${challenge}`);
+  return finishAuthorization(oauthRequest, env, clientName, pending.cookies);
 }
 
 function authorizationErrorResponse(error: unknown, lang: Lang): Response {
@@ -176,6 +207,17 @@ export const AuthHandler = {
 
     if (pathname === SESSION_CLAIM_PATH) {
       return await claimSession(request, env.OAUTH_KV);
+    }
+
+    if (pathname === SESSION_COMPLETE_PATH) {
+      try {
+        return await handleRemoteSessionComplete(request, env);
+      } catch (error) {
+        return authorizationErrorResponse(
+          error,
+          pickLang(request.headers.get("accept-language")),
+        );
+      }
     }
 
     if (pathname === SESSION_STATUS_PATH) {

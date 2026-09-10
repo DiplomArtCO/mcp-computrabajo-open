@@ -47,6 +47,19 @@ export async function claimSession(
   return json({ ok: true });
 }
 
+export async function getClaimedSession(
+  challenge: string,
+  kv: RemoteSessionKv,
+): Promise<PendingSession | null> {
+  if (!CHALLENGE_PATTERN.test(challenge)) return null;
+  const pending = await kv.get<PendingSession>(
+    `${SESSION_KEY_PREFIX}${challenge}`,
+    "json",
+  );
+  if (!pending?.cookies) return null;
+  return pending;
+}
+
 export async function sessionStatus(
   request: Request,
   kv: RemoteSessionKv,

@@ -128,7 +128,6 @@ export function renderConsentPage(params: {
   action: string;
   lang: Lang;
   remoteLoginUrl: string;
-  statusUrl: string;
   challenge: string;
   error?: CookieError;
 }): string {
@@ -136,7 +135,6 @@ export function renderConsentPage(params: {
   const client = escapeHtml(params.clientName);
   const error = params.error ? escapeHtml(t.errors[params.error]) : "";
   const remoteLoginUrl = escapeHtml(params.remoteLoginUrl);
-  const statusUrl = escapeHtml(params.statusUrl);
   const challenge = escapeHtml(params.challenge);
 
   return `<!doctype html>
@@ -179,19 +177,6 @@ export function renderConsentPage(params: {
   </form>
   <footer>${t.footer}</footer>
 </main>
-<script>
-const form = document.querySelector("form");
-const statusUrl = ${JSON.stringify(statusUrl)};
-const poll = async () => {
-  try {
-    const response = await fetch(statusUrl, { credentials: "same-origin" });
-    const data = await response.json();
-    if (data.status === "ready") form.requestSubmit();
-    else if (data.status === "pending") setTimeout(poll, 1000);
-  } catch (_) {}
-};
-poll();
-</script>
 </body>
 </html>`;
 }

@@ -67,11 +67,9 @@ export async function startRemoteLogin(
       });
       if (!claim.ok) throw new Error("El enlace remoto expiró o ya fue utilizado.");
 
-      response(
-        res,
-        200,
-        "<p>Sesión detectada. Puedes cerrar esta pestaña y volver al cliente MCP.</p>",
-      );
+      const completionUrl = `${remoteServer}/session/complete?challenge=${encodeURIComponent(challenge)}`;
+      res.writeHead(302, { Location: completionUrl });
+      res.end();
     } catch (error) {
       void error;
       response(
