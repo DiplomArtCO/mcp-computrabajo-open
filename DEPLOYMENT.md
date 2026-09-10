@@ -43,12 +43,15 @@ campos ocultos.
 
 Configura estos secretos en el repositorio propio, sin escribirlos en archivos:
 
-- `NPM_TOKEN`: granular access token con publicación únicamente para este paquete.
 - `CLOUDFLARE_API_TOKEN`: token limitado al despliegue del Worker.
 - `CLOUDFLARE_ACCOUNT_ID`: cuenta Cloudflare propietaria.
 
-El workflow de npm se activa con tags `v*.*.*`. El workflow de Cloudflare se
-activa con pushes a `main`.
+El workflow de npm se activa con tags `v*.*.*` y usa Trusted Publishing de npm
+mediante OIDC; no requiere guardar un `NPM_TOKEN`. En la configuración del
+paquete npm, agrega como Trusted Publisher el repositorio
+`DiplomArtCO/mcp-computrabajo-open`, el workflow
+`.github/workflows/publish-npm.yml` y el entorno GitHub Actions. El workflow de
+Cloudflare se activa con pushes a `main`.
 
 ## Publicación
 
