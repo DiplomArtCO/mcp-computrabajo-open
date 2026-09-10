@@ -65,11 +65,11 @@
     "@types/bun": "1.3.14",
     "@types/node": "^22.20.2",
     "husky": "9.1.7",
-    "typescript": "5.8.3",
+    "typescript": "7.0.2",
     "wrangler": "^4.130.0"
   },
   "peerDependencies": {
-    "typescript": "5.8.3"
+    "typescript": "7.0.2"
   },
   "dependencies": {
     "@cloudflare/workers-oauth-provider": "0.10.3",
